@@ -5,6 +5,9 @@ import AuthPage from "./AuthPage.jsx";
 import { useAuth } from "./lib/AuthContext.jsx";
 import { useFavorites } from "./lib/useFavorites.js";
 import FavorisManager from "./FavorisManager.jsx";
+import BetModal from "./BetModal.jsx";
+import CarnetTab from "./CarnetTab.jsx";
+import { useBets } from "./lib/useBets.js";
 import {
   formatGoals,
   formatPercent,
@@ -42,6 +45,7 @@ function compFlag(name) {
 const TABS = [
   { id: "matches",    label: "Pronostics du jour" },
   { id: "favoris",    label: "Mes favoris" },
+  { id: "carnet",     label: "Carnet de paris" },
   { id: "toppicks",   label: "Top picks" },
   { id: "historique", label: "Historique" },
   { id: "stats",      label: "Statistiques" },
@@ -176,7 +180,7 @@ function OddsButton({ label, value, isTop }) {
 /* ============================================================
    MATCH ROW  (compact, betting-site style)
    ============================================================ */
-function MatchRow({ match, onOpen, favTeams = [], onToggleTeam }) {
+function MatchRow({ match, onOpen, favTeams = [], onToggleTeam, onBet }) {
   const meta         = trustMeta(match.trust_level);
   const insufficient = match.status_prediction === "INSUFFICIENT_HISTORY";
   const hasFavTeam   = favTeams.includes(match.home_team) || favTeams.includes(match.away_team);
@@ -241,6 +245,19 @@ function MatchRow({ match, onOpen, favTeams = [], onToggleTeam }) {
         {match.trust_level || "—"}
       </div>
 
+      {/* Bet button */}
+      {!insufficient && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onBet?.(match); }}
+          className="shrink-0 flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 text-white/25 transition hover:border-emerald-500/30 hover:bg-emerald-500/10 hover:text-emerald-400"
+          title="Enregistrer un pari"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </button>
+      )}
+
       {/* Arrow */}
       <svg className="h-4 w-4 shrink-0 text-white/15 transition-colors group-hover:text-white/45" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M9 18l6-6-6-6" />
@@ -252,7 +269,7 @@ function MatchRow({ match, onOpen, favTeams = [], onToggleTeam }) {
 /* ============================================================
    COMPETITION GROUP  (collapsible)
    ============================================================ */
-function CompetitionGroup({ name, matches, onOpen, favCompetitions = [], onToggleComp, favTeams = [], onToggleTeam }) {
+function CompetitionGroup({ name, matches, onOpen, favCompetitions = [], onToggleComp, favTeams = [], onToggleTeam, onBet }) {
   const [open, setOpen] = useState(true);
   const flag = compFlag(name);
 
@@ -294,7 +311,7 @@ function CompetitionGroup({ name, matches, onOpen, favCompetitions = [], onToggl
           </div>
 
           {matches.map((m, i) => (
-            <MatchRow key={`${m.home_team}-${m.away_team}-${i}`} match={m} onOpen={onOpen} favTeams={favTeams} onToggleTeam={onToggleTeam} />
+            <MatchRow key={`${m.home_team}-${m.away_team}-${i}`} match={m} onOpen={onOpen} favTeams={favTeams} onToggleTeam={onToggleTeam} onBet={onBet} />
           ))}
         </>
       )}
@@ -359,7 +376,7 @@ function EmptyState({ onRun, predicting }) {
    TAB VIEWS
    ============================================================ */
 
-function MatchesTab({ groupedMatches, visibleMatches, predicting, onOpen, onRun, favTeams, favCompetitions, onToggleTeam, onToggleComp }) {
+function MatchesTab({ groupedMatches, visibleMatches, predicting, onOpen, onRun, favTeams, favCompetitions, onToggleTeam, onToggleComp, onBet }) {
   if (predicting && visibleMatches.length === 0) {
     return (
       <div className="space-y-3">
@@ -376,7 +393,7 @@ function MatchesTab({ groupedMatches, visibleMatches, predicting, onOpen, onRun,
       {groupedMatches.map(([comp, list]) => (
         <CompetitionGroup key={comp} name={comp} matches={list} onOpen={onOpen}
           favCompetitions={favCompetitions} onToggleComp={onToggleComp}
-          favTeams={favTeams} onToggleTeam={onToggleTeam}
+          favTeams={favTeams} onToggleTeam={onToggleTeam} onBet={onBet}
         />
       ))}
     </div>
@@ -846,6 +863,8 @@ function FilterBtn({ label, value, current, onClick }) {
 function DashboardPage() {
   const { user, signOut }                               = useAuth();
   const { favTeams, favCompetitions, isFav, toggle }    = useFavorites();
+  const { bets, loading: betsLoading, addBet, updateResult, deleteBet } = useBets();
+  const [betMatch, setBetMatch] = useState(null);
   const [summary,    setSummary]    = useState(null);
   const [matches,    setMatches]    = useState([]);
   const [topPicks,   setTopPicks]   = useState([]);
@@ -944,6 +963,7 @@ function DashboardPage() {
   /* ── RENDER ── */
   return (
     <div className="flex flex-col bg-[#0d1520] text-white" style={{ height: "100dvh", overflow: "hidden" }}>
+      {betMatch && <BetModal match={betMatch} onAdd={addBet} onClose={() => setBetMatch(null)} />}
 
       {/* ════════════════════ TOP NAV ════════════════════ */}
       <header className="anim-slide-down flex h-[52px] shrink-0 items-center gap-3 border-b border-white/8 bg-[#091624] px-4">
@@ -1135,6 +1155,7 @@ function DashboardPage() {
                 favCompetitions={favCompetitions}
                 onToggleTeam={(name) => toggle("team", name)}
                 onToggleComp={(name) => toggle("competition", name)}
+                onBet={setBetMatch}
               />
             )}
             {activeTab === "favoris" && (
@@ -1146,6 +1167,14 @@ function DashboardPage() {
                 onToggleComp={(name) => toggle("competition", name)}
                 onToggle={toggle}
                 onOpen={openMatch}
+              />
+            )}
+            {activeTab === "carnet" && (
+              <CarnetTab
+                bets={bets}
+                loading={betsLoading}
+                onUpdateResult={updateResult}
+                onDelete={deleteBet}
               />
             )}
             {activeTab === "toppicks" && (
