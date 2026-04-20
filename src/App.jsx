@@ -245,19 +245,21 @@ function MatchRow({ match, onOpen, favTeams = [], onToggleTeam, onBet }) {
         {match.trust_level || "—"}
       </div>
 
-      {/* Bet button */}
-      {!insufficient && (
-        <button
-          onClick={(e) => { e.stopPropagation(); onBet?.(match); }}
-          className="shrink-0 flex items-center gap-1 rounded-lg border border-emerald-500/25 bg-emerald-500/8 px-2 py-1 text-[10px] font-semibold text-emerald-400 transition hover:bg-emerald-500/20"
-          title="Enregistrer un pari"
-        >
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-          <span className="hidden sm:inline">Parier</span>
-        </button>
-      )}
+      {/* Bet button — fixed width, invisible until hover */}
+      <div className="w-16 shrink-0 flex justify-center">
+        {!insufficient && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onBet?.(match); }}
+            className="opacity-0 group-hover:opacity-100 flex items-center gap-1 rounded-lg border border-emerald-500/25 bg-emerald-500/8 px-2 py-1 text-[10px] font-semibold text-emerald-400 transition-all hover:bg-emerald-500/20"
+            title="Enregistrer un pari"
+          >
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Parier
+          </button>
+        )}
+      </div>
 
       {/* Arrow */}
       <svg className="h-4 w-4 shrink-0 text-white/15 transition-colors group-hover:text-white/45" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
