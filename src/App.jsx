@@ -3,6 +3,7 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import Matchdetails from "./Matchdetails.jsx";
 import AuthPage from "./AuthPage.jsx";
 import { useAuth } from "./lib/AuthContext.jsx";
+import { useFavorites } from "./lib/useFavorites.js";
 import {
   formatGoals,
   formatPercent,
@@ -39,6 +40,7 @@ function compFlag(name) {
 /* ── Tab definitions ── */
 const TABS = [
   { id: "matches",    label: "Pronostics du jour" },
+  { id: "favoris",    label: "Mes favoris" },
   { id: "toppicks",   label: "Top picks" },
   { id: "historique", label: "Historique" },
   { id: "stats",      label: "Statistiques" },
@@ -115,6 +117,23 @@ function Logo({ size = 30 }) {
 }
 
 /* ============================================================
+   STAR BUTTON (favoris)
+   ============================================================ */
+function StarButton({ active, onClick, size = 14 }) {
+  return (
+    <button
+      onClick={(e) => { e.stopPropagation(); onClick(); }}
+      className={`shrink-0 transition-colors ${active ? "text-amber-400" : "text-white/15 hover:text-white/40"}`}
+      title={active ? "Retirer des favoris" : "Ajouter aux favoris"}
+    >
+      <svg width={size} height={size} viewBox="0 0 24 24" fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+      </svg>
+    </button>
+  );
+}
+
+/* ============================================================
    PING BADGE (live)
    ============================================================ */
 function PingBadge({ label = "Live", color = "emerald" }) {
@@ -156,9 +175,10 @@ function OddsButton({ label, value, isTop }) {
 /* ============================================================
    MATCH ROW  (compact, betting-site style)
    ============================================================ */
-function MatchRow({ match, onOpen }) {
+function MatchRow({ match, onOpen, favTeams = [], onToggleTeam }) {
   const meta         = trustMeta(match.trust_level);
   const insufficient = match.status_prediction === "INSUFFICIENT_HISTORY";
+  const hasFavTeam   = favTeams.includes(match.home_team) || favTeams.includes(match.away_team);
 
   return (
     <div
@@ -175,10 +195,12 @@ function MatchRow({ match, onOpen }) {
         <div className="flex items-center gap-2">
           <TeamLogo name={match.home_team} logo={match.home_badge} size="h-5 w-5" />
           <span className="truncate text-sm font-medium text-white/88">{match.home_team}</span>
+          <StarButton active={favTeams.includes(match.home_team)} onClick={() => onToggleTeam?.(match.home_team)} />
         </div>
         <div className="mt-1.5 flex items-center gap-2">
           <TeamLogo name={match.away_team} logo={match.away_badge} size="h-5 w-5" />
           <span className="truncate text-sm font-medium text-white/88">{match.away_team}</span>
+          <StarButton active={favTeams.includes(match.away_team)} onClick={() => onToggleTeam?.(match.away_team)} />
         </div>
         {/* Date shown inline on xs */}
         <p className="mt-1 text-[10px] text-white/25 sm:hidden">{match.date || ""}</p>
@@ -229,7 +251,7 @@ function MatchRow({ match, onOpen }) {
 /* ============================================================
    COMPETITION GROUP  (collapsible)
    ============================================================ */
-function CompetitionGroup({ name, matches, onOpen }) {
+function CompetitionGroup({ name, matches, onOpen, favCompetitions = [], onToggleComp, favTeams = [], onToggleTeam }) {
   const [open, setOpen] = useState(true);
   const flag = compFlag(name);
 
@@ -242,6 +264,7 @@ function CompetitionGroup({ name, matches, onOpen }) {
       >
         <span className="text-base leading-none">{flag}</span>
         <span className="text-sm font-semibold text-white/88">{name}</span>
+        <StarButton active={favCompetitions.includes(name)} onClick={() => onToggleComp?.(name)} size={13} />
         <span className="ml-auto mr-2 text-xs text-white/30">
           {matches.length} match{matches.length > 1 ? "s" : ""}
         </span>
@@ -270,7 +293,7 @@ function CompetitionGroup({ name, matches, onOpen }) {
           </div>
 
           {matches.map((m, i) => (
-            <MatchRow key={`${m.home_team}-${m.away_team}-${i}`} match={m} onOpen={onOpen} />
+            <MatchRow key={`${m.home_team}-${m.away_team}-${i}`} match={m} onOpen={onOpen} favTeams={favTeams} onToggleTeam={onToggleTeam} />
           ))}
         </>
       )}
@@ -335,7 +358,7 @@ function EmptyState({ onRun, predicting }) {
    TAB VIEWS
    ============================================================ */
 
-function MatchesTab({ groupedMatches, visibleMatches, predicting, onOpen, onRun }) {
+function MatchesTab({ groupedMatches, visibleMatches, predicting, onOpen, onRun, favTeams, favCompetitions, onToggleTeam, onToggleComp }) {
   if (predicting && visibleMatches.length === 0) {
     return (
       <div className="space-y-3">
@@ -350,7 +373,54 @@ function MatchesTab({ groupedMatches, visibleMatches, predicting, onOpen, onRun 
   return (
     <div className="space-y-3">
       {groupedMatches.map(([comp, list]) => (
-        <CompetitionGroup key={comp} name={comp} matches={list} onOpen={onOpen} />
+        <CompetitionGroup key={comp} name={comp} matches={list} onOpen={onOpen}
+          favCompetitions={favCompetitions} onToggleComp={onToggleComp}
+          favTeams={favTeams} onToggleTeam={onToggleTeam}
+        />
+      ))}
+    </div>
+  );
+}
+
+function FavorisTab({ matches, favTeams, favCompetitions, onToggleTeam, onToggleComp, onOpen }) {
+  const favMatches = matches.filter((m) =>
+    favTeams.includes(m.home_team) || favTeams.includes(m.away_team) || favCompetitions.includes(m.competition_name)
+  );
+
+  if (favTeams.length === 0 && favCompetitions.length === 0) {
+    return (
+      <div className="rounded-xl border border-dashed border-white/12 bg-white/[0.02] px-8 py-16 text-center">
+        <p className="text-2xl mb-3">⭐</p>
+        <h3 className="text-lg font-semibold text-white">Aucun favori</h3>
+        <p className="mt-2 text-sm text-white/40">
+          Clique sur l'étoile à côté d'une équipe ou d'une compétition pour l'ajouter à tes favoris.
+        </p>
+      </div>
+    );
+  }
+
+  if (favMatches.length === 0) {
+    return (
+      <div className="rounded-xl border border-dashed border-white/12 bg-white/[0.02] px-8 py-16 text-center">
+        <p className="text-sm text-white/40">Aucun match du jour pour tes équipes/compétitions favorites.</p>
+      </div>
+    );
+  }
+
+  const grouped = {};
+  for (const m of favMatches) {
+    const c = m.competition_name || "Autres";
+    if (!grouped[c]) grouped[c] = [];
+    grouped[c].push(m);
+  }
+
+  return (
+    <div className="space-y-3">
+      {Object.entries(grouped).map(([comp, list]) => (
+        <CompetitionGroup key={comp} name={comp} matches={list} onOpen={onOpen}
+          favCompetitions={favCompetitions} onToggleComp={onToggleComp}
+          favTeams={favTeams} onToggleTeam={onToggleTeam}
+        />
       ))}
     </div>
   );
@@ -752,7 +822,8 @@ function FilterBtn({ label, value, current, onClick }) {
    DASHBOARD PAGE
    ============================================================ */
 function DashboardPage() {
-  const { user, signOut }            = useAuth();
+  const { user, signOut }                               = useAuth();
+  const { favTeams, favCompetitions, isFav, toggle }    = useFavorites();
   const [summary,    setSummary]    = useState(null);
   const [matches,    setMatches]    = useState([]);
   const [topPicks,   setTopPicks]   = useState([]);
@@ -1038,6 +1109,20 @@ function DashboardPage() {
                 predicting={predicting}
                 onOpen={openMatch}
                 onRun={runPredictions}
+                favTeams={favTeams}
+                favCompetitions={favCompetitions}
+                onToggleTeam={(name) => toggle("team", name)}
+                onToggleComp={(name) => toggle("competition", name)}
+              />
+            )}
+            {activeTab === "favoris" && (
+              <FavorisTab
+                matches={matches}
+                favTeams={favTeams}
+                favCompetitions={favCompetitions}
+                onToggleTeam={(name) => toggle("team", name)}
+                onToggleComp={(name) => toggle("competition", name)}
+                onOpen={openMatch}
               />
             )}
             {activeTab === "toppicks" && (
