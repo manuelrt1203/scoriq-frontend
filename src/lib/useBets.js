@@ -2,6 +2,26 @@ import { useEffect, useState } from "react";
 import { supabase } from "./supabase";
 import { useAuth } from "./AuthContext";
 
+const API_BASE = "https://web-production-4b111.up.railway.app";
+
+function normalize(str) {
+  return (str || "").toLowerCase().trim();
+}
+
+function evaluatePick(pick, result) {
+  const { real_home_goals: h, real_away_goals: a, real_total_goals: t, real_btts: btts, real_over_2_5: over25, over_1_5: over15 } = result;
+  const real1x2 = h > a ? "1" : h < a ? "2" : "X";
+  switch (pick) {
+    case "1":        return real1x2 === "1" ? "WIN" : "LOSS";
+    case "X":        return real1x2 === "X" ? "WIN" : "LOSS";
+    case "2":        return real1x2 === "2" ? "WIN" : "LOSS";
+    case "BTTS":     return btts === 1 ? "WIN" : "LOSS";
+    case "Over 1.5": return (over15 >= 0.5 || t > 1) ? "WIN" : "LOSS";
+    case "Over 2.5": return (over25 === 1 || t > 2) ? "WIN" : "LOSS";
+    default:         return null;
+  }
+}
+
 export function useBets() {
   const { user } = useAuth();
   const [bets, setBets]       = useState([]);
@@ -43,6 +63,29 @@ export function useBets() {
     return error;
   }
 
+  async function autoEvaluate() {
+    const pending = bets.filter((b) => !b.result);
+    if (pending.length === 0) return { evaluated: 0 };
+
+    const results = await fetch(`${API_BASE}/results/evaluated?days=30`).then((r) => r.json()).catch(() => []);
+
+    let evaluated = 0;
+    for (const bet of pending) {
+      const match = results.find((r) =>
+        normalize(r.home_team) === normalize(bet.match_home) &&
+        normalize(r.away_team) === normalize(bet.match_away)
+      );
+      if (!match) continue;
+
+      const result = evaluatePick(bet.pick, match);
+      if (!result) continue;
+
+      await updateResult(bet.id, result);
+      evaluated++;
+    }
+    return { evaluated };
+  }
+
   async function deleteBet(id) {
     await supabase.from("bets").delete().eq("id", id);
     setBets((prev) => prev.filter((b) => b.id !== id));
@@ -63,5 +106,5 @@ export function useBets() {
     };
   })();
 
-  return { bets, loading, addBet, updateResult, deleteBet, stats };
+  return { bets, loading, addBet, updateResult, deleteBet, autoEvaluate, stats };
 }

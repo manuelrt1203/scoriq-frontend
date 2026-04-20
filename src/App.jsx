@@ -866,7 +866,7 @@ function FilterBtn({ label, value, current, onClick }) {
 function DashboardPage() {
   const { user, signOut }                               = useAuth();
   const { favTeams, favCompetitions, isFav, toggle }    = useFavorites();
-  const { bets, loading: betsLoading, addBet, updateResult, deleteBet } = useBets();
+  const { bets, loading: betsLoading, addBet, updateResult, deleteBet, autoEvaluate } = useBets();
   const [betMatch, setBetMatch] = useState(null);
   const [summary,    setSummary]    = useState(null);
   const [matches,    setMatches]    = useState([]);
@@ -1178,6 +1178,7 @@ function DashboardPage() {
                 loading={betsLoading}
                 onUpdateResult={updateResult}
                 onDelete={deleteBet}
+                onAutoEvaluate={autoEvaluate}
               />
             )}
             {activeTab === "toppicks" && (

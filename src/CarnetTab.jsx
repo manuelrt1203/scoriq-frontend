@@ -17,8 +17,18 @@ function StatCard({ label, value, sub, accent }) {
   );
 }
 
-export default function CarnetTab({ bets, loading, onUpdateResult, onDelete }) {
-  const [filter, setFilter] = useState("ALL");
+export default function CarnetTab({ bets, loading, onUpdateResult, onDelete, onAutoEvaluate }) {
+  const [filter, setFilter]       = useState("ALL");
+  const [evaluating, setEvaluating] = useState(false);
+  const [evalMsg, setEvalMsg]     = useState("");
+
+  async function handleAutoEvaluate() {
+    setEvaluating(true);
+    setEvalMsg("");
+    const { evaluated } = await onAutoEvaluate();
+    setEvalMsg(evaluated > 0 ? `${evaluated} pari${evaluated > 1 ? "s" : ""} mis à jour automatiquement.` : "Aucun résultat trouvé pour tes paris en attente.");
+    setEvaluating(false);
+  }
 
   const filtered = bets.filter((b) => filter === "ALL" ? true : b.result === filter || (filter === "PENDING" && !b.result));
 
@@ -60,6 +70,24 @@ export default function CarnetTab({ bets, loading, onUpdateResult, onDelete }) {
         <StatCard label="Profit net"   value={stats.profit != null ? `${stats.profit > 0 ? "+" : ""}${stats.profit} €` : null} accent={stats.profit > 0} />
         <StatCard label="ROI"          value={stats.roi} sub="retour sur mise" accent={parseFloat(stats.roi) > 0} />
       </div>
+
+      {/* Auto-évaluation */}
+      {bets.some((b) => !b.result) && (
+        <div className="flex items-center gap-3 rounded-xl border border-emerald-500/15 bg-emerald-500/5 px-4 py-3">
+          <div className="flex-1">
+            <p className="text-sm font-medium text-white/80">Vérifier les résultats automatiquement</p>
+            <p className="text-xs text-white/35">Compare tes paris en attente aux vrais scores de la base.</p>
+            {evalMsg && <p className="mt-1 text-xs text-emerald-400">{evalMsg}</p>}
+          </div>
+          <button
+            onClick={handleAutoEvaluate}
+            disabled={evaluating}
+            className="btn-green shrink-0 rounded-lg px-4 py-2 text-sm font-semibold text-white"
+          >
+            {evaluating ? "Vérification…" : "Auto-évaluer"}
+          </button>
+        </div>
+      )}
 
       {/* Filtres */}
       <div className="flex flex-wrap gap-1.5">
