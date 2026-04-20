@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import Matchdetails from "./Matchdetails.jsx";
+import AuthPage from "./AuthPage.jsx";
+import { useAuth } from "./lib/AuthContext.jsx";
 import {
   formatGoals,
   formatPercent,
@@ -750,6 +752,7 @@ function FilterBtn({ label, value, current, onClick }) {
    DASHBOARD PAGE
    ============================================================ */
 function DashboardPage() {
+  const { user, signOut }            = useAuth();
   const [summary,    setSummary]    = useState(null);
   const [matches,    setMatches]    = useState([]);
   const [topPicks,   setTopPicks]   = useState([]);
@@ -891,6 +894,15 @@ function DashboardPage() {
           >
             Rafraîchir
           </button>
+          <div className="hidden items-center gap-2 xl:flex">
+            <span className="text-[11px] text-white/30 truncate max-w-[120px]">{user?.email}</span>
+            <button
+              onClick={signOut}
+              className="rounded-lg border border-white/10 px-2.5 py-1.5 text-[11px] text-white/40 transition hover:bg-white/[0.06] hover:text-white/70"
+            >
+              Déconnexion
+            </button>
+          </div>
           <button
             onClick={runPredictions}
             disabled={predicting}
@@ -1141,6 +1153,18 @@ function DashboardPage() {
    APP ROUTER
    ============================================================ */
 export default function App() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#0d1520]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/10 border-t-emerald-400" />
+      </div>
+    );
+  }
+
+  if (!user) return <AuthPage />;
+
   return (
     <Routes>
       <Route path="/"          element={<DashboardPage />} />
