@@ -4,6 +4,7 @@ import Matchdetails from "./Matchdetails.jsx";
 import AuthPage from "./AuthPage.jsx";
 import { useAuth } from "./lib/AuthContext.jsx";
 import { useFavorites } from "./lib/useFavorites.js";
+import FavorisManager from "./FavorisManager.jsx";
 import {
   formatGoals,
   formatPercent,
@@ -382,28 +383,41 @@ function MatchesTab({ groupedMatches, visibleMatches, predicting, onOpen, onRun,
   );
 }
 
-function FavorisTab({ matches, favTeams, favCompetitions, onToggleTeam, onToggleComp, onOpen }) {
+function FavorisTab({ matches, favTeams, favCompetitions, onToggleTeam, onToggleComp, onOpen, onToggle }) {
+  const [showManager, setShowManager] = useState(false);
   const favMatches = matches.filter((m) =>
     favTeams.includes(m.home_team) || favTeams.includes(m.away_team) || favCompetitions.includes(m.competition_name)
   );
 
   if (favTeams.length === 0 && favCompetitions.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-white/12 bg-white/[0.02] px-8 py-16 text-center">
-        <p className="text-2xl mb-3">⭐</p>
-        <h3 className="text-lg font-semibold text-white">Aucun favori</h3>
-        <p className="mt-2 text-sm text-white/40">
-          Clique sur l'étoile à côté d'une équipe ou d'une compétition pour l'ajouter à tes favoris.
-        </p>
-      </div>
+      <>
+        {showManager && <FavorisManager favTeams={favTeams} favCompetitions={favCompetitions} onToggle={onToggle} onClose={() => setShowManager(false)} />}
+        <div className="rounded-xl border border-dashed border-white/12 bg-white/[0.02] px-8 py-16 text-center">
+          <p className="text-2xl mb-3">⭐</p>
+          <h3 className="text-lg font-semibold text-white">Aucun favori</h3>
+          <p className="mt-2 text-sm text-white/40 max-w-xs mx-auto">
+            Ajoute des équipes ou compétitions favorites pour voir leurs matchs ici.
+          </p>
+          <button onClick={() => setShowManager(true)} className="btn-green mt-5 rounded-lg px-5 py-2 text-sm font-semibold text-white">
+            Gérer mes favoris
+          </button>
+        </div>
+      </>
     );
   }
 
   if (favMatches.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-white/12 bg-white/[0.02] px-8 py-16 text-center">
-        <p className="text-sm text-white/40">Aucun match du jour pour tes équipes/compétitions favorites.</p>
-      </div>
+      <>
+        {showManager && <FavorisManager favTeams={favTeams} favCompetitions={favCompetitions} onToggle={onToggle} onClose={() => setShowManager(false)} />}
+        <div className="rounded-xl border border-dashed border-white/12 bg-white/[0.02] px-8 py-16 text-center">
+          <p className="text-sm text-white/40 mb-4">Aucun match du jour pour tes équipes/compétitions favorites.</p>
+          <button onClick={() => setShowManager(true)} className="rounded-lg border border-white/10 px-4 py-2 text-xs text-white/50 transition hover:bg-white/[0.05] hover:text-white/80">
+            Gérer mes favoris
+          </button>
+        </div>
+      </>
     );
   }
 
@@ -415,14 +429,22 @@ function FavorisTab({ matches, favTeams, favCompetitions, onToggleTeam, onToggle
   }
 
   return (
-    <div className="space-y-3">
-      {Object.entries(grouped).map(([comp, list]) => (
-        <CompetitionGroup key={comp} name={comp} matches={list} onOpen={onOpen}
-          favCompetitions={favCompetitions} onToggleComp={onToggleComp}
-          favTeams={favTeams} onToggleTeam={onToggleTeam}
-        />
-      ))}
-    </div>
+    <>
+      {showManager && <FavorisManager favTeams={favTeams} favCompetitions={favCompetitions} onToggle={onToggle} onClose={() => setShowManager(false)} />}
+      <div className="mb-3 flex justify-end">
+        <button onClick={() => setShowManager(true)} className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-white/45 transition hover:bg-white/[0.05] hover:text-white/80">
+          ⭐ Gérer mes favoris
+        </button>
+      </div>
+      <div className="space-y-3">
+        {Object.entries(grouped).map(([comp, list]) => (
+          <CompetitionGroup key={comp} name={comp} matches={list} onOpen={onOpen}
+            favCompetitions={favCompetitions} onToggleComp={onToggleComp}
+            favTeams={favTeams} onToggleTeam={onToggleTeam}
+          />
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -1122,6 +1144,7 @@ function DashboardPage() {
                 favCompetitions={favCompetitions}
                 onToggleTeam={(name) => toggle("team", name)}
                 onToggleComp={(name) => toggle("competition", name)}
+                onToggle={toggle}
                 onOpen={openMatch}
               />
             )}
