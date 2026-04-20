@@ -249,12 +249,13 @@ function MatchRow({ match, onOpen, favTeams = [], onToggleTeam, onBet }) {
       {!insufficient && (
         <button
           onClick={(e) => { e.stopPropagation(); onBet?.(match); }}
-          className="shrink-0 flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 text-white/25 transition hover:border-emerald-500/30 hover:bg-emerald-500/10 hover:text-emerald-400"
+          className="shrink-0 flex items-center gap-1 rounded-lg border border-emerald-500/25 bg-emerald-500/8 px-2 py-1 text-[10px] font-semibold text-emerald-400 transition hover:bg-emerald-500/20"
           title="Enregistrer un pari"
         >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 5v14M5 12h14" />
           </svg>
+          <span className="hidden sm:inline">Parier</span>
         </button>
       )}
 
