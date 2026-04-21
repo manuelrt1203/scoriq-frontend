@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "./lib/AuthContext";
+import { useLang } from "./lib/LanguageContext";
 
 function Logo({ size = 32 }) {
   return (
@@ -16,28 +17,41 @@ function Logo({ size = 32 }) {
   );
 }
 
+function LangToggle({ lang, toggleLang }) {
+  return (
+    <button
+      onClick={toggleLang}
+      className="flex items-center gap-px rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs font-bold transition hover:bg-white/[0.08]"
+    >
+      <span className={lang === "fr" ? "text-emerald-300" : "text-white/30"}>FR</span>
+      <span className="mx-1 text-white/20">·</span>
+      <span className={lang === "en" ? "text-emerald-300" : "text-white/30"}>EN</span>
+    </button>
+  );
+}
+
 export default function AuthPage() {
-  const { signIn, signUp } = useAuth();
-  const [mode, setMode]       = useState("login"); // "login" | "register"
-  const [email, setEmail]     = useState("");
+  const { signIn, signUp }    = useAuth();
+  const { lang, toggleLang, t } = useLang();
+  const ta = t.auth;
+
+  const [mode,     setMode]     = useState("login");
+  const [email,    setEmail]    = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError]     = useState("");
-  const [success, setSuccess] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [error,    setError]    = useState("");
+  const [success,  setSuccess]  = useState("");
+  const [loading,  setLoading]  = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setError("");
-    setSuccess("");
-    setLoading(true);
-
+    setError(""); setSuccess(""); setLoading(true);
     if (mode === "login") {
       const err = await signIn(email, password);
       if (err) setError(err.message);
     } else {
       const err = await signUp(email, password);
       if (err) setError(err.message);
-      else setSuccess("Compte créé ! Vérifie ton email pour confirmer ton inscription.");
+      else setSuccess(ta.confirm_email);
     }
     setLoading(false);
   }
@@ -45,83 +59,65 @@ export default function AuthPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#0d1520] px-4">
 
-      {/* Card */}
-      <div className="w-full max-w-sm rounded-2xl border border-white/8 bg-[#111e2b] p-8">
+      {/* Lang toggle top-right */}
+      <div className="absolute top-4 right-4">
+        <LangToggle lang={lang} toggleLang={toggleLang} />
+      </div>
+
+      <div className="w-full max-w-sm rounded-2xl border border-white/8 bg-[#111e2b] p-8 shadow-2xl">
 
         {/* Brand */}
         <div className="mb-8 flex flex-col items-center gap-3">
           <Logo size={44} />
           <div className="text-center">
             <h1 className="brand-text text-2xl font-bold tracking-tight text-white">ScorIQ</h1>
-            <p className="mt-1 text-xs text-white/35">L'IA qui voit les matchs autrement</p>
+            <p className="mt-1 text-xs text-white/35">{t.slogan}</p>
           </div>
         </div>
 
-        {/* Toggle */}
+        {/* Toggle login / register */}
         <div className="mb-6 flex rounded-lg border border-white/8 bg-white/[0.04] p-1">
           {["login", "register"].map((m) => (
             <button
               key={m}
               onClick={() => { setMode(m); setError(""); setSuccess(""); }}
               className={`flex-1 rounded-md py-2 text-sm font-semibold transition ${
-                mode === m
-                  ? "bg-emerald-500/20 text-emerald-300"
-                  : "text-white/35 hover:text-white/60"
+                mode === m ? "bg-emerald-500/20 text-emerald-300" : "text-white/35 hover:text-white/60"
               }`}
             >
-              {m === "login" ? "Connexion" : "Inscription"}
+              {m === "login" ? ta.login : ta.register}
             </button>
           ))}
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-white/50">Email</label>
+            <label className="mb-1.5 block text-xs font-medium text-white/50">{ta.email}</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="toi@exemple.com"
+              type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+              required placeholder="you@example.com"
               className="w-full rounded-lg border border-white/10 bg-white/[0.05] px-3 py-2.5 text-sm text-white placeholder:text-white/20 outline-none focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/15 transition"
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-white/50">Mot de passe</label>
+            <label className="mb-1.5 block text-xs font-medium text-white/50">{ta.password}</label>
             <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="••••••••"
-              minLength={6}
+              type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+              required placeholder="••••••••" minLength={6}
               className="w-full rounded-lg border border-white/10 bg-white/[0.05] px-3 py-2.5 text-sm text-white placeholder:text-white/20 outline-none focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/15 transition"
             />
           </div>
 
-          {error && (
-            <p className="rounded-lg border border-rose-400/20 bg-rose-500/8 px-3 py-2 text-xs text-rose-300">
-              {error}
-            </p>
-          )}
-          {success && (
-            <p className="rounded-lg border border-emerald-400/20 bg-emerald-500/8 px-3 py-2 text-xs text-emerald-300">
-              {success}
-            </p>
-          )}
+          {error   && <p className="rounded-lg border border-rose-400/20 bg-rose-500/8 px-3 py-2 text-xs text-rose-300">{error}</p>}
+          {success && <p className="rounded-lg border border-emerald-400/20 bg-emerald-500/8 px-3 py-2 text-xs text-emerald-300">{success}</p>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-green w-full rounded-lg py-2.5 text-sm font-semibold text-white"
-          >
-            {loading ? "…" : mode === "login" ? "Se connecter" : "Créer mon compte"}
+          <button type="submit" disabled={loading} className="btn-green w-full rounded-lg py-2.5 text-sm font-semibold text-white">
+            {loading ? ta.loading : mode === "login" ? ta.sign_in : ta.create_account}
           </button>
         </form>
       </div>
 
-      <p className="mt-6 text-xs text-white/20">ScorIQ · Pronostics IA</p>
+      <p className="mt-6 text-xs text-white/20">{ta.footer}</p>
     </div>
   );
 }

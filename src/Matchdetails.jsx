@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   formatGoals,
@@ -10,6 +11,142 @@ import {
 
 const BRAND  = "ScorIQ";
 const SLOGAN = "L'IA qui voit les matchs autrement";
+
+const API_BASE = "https://web-production-4b111.up.railway.app";
+
+/* ─── Tête-à-tête ──────────────────────────────────────── */
+function H2HSection({ homeTeam, awayTeam }) {
+  const [matches, setMatches] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${API_BASE}/h2h?home=${encodeURIComponent(homeTeam)}&away=${encodeURIComponent(awayTeam)}&limit=8`)
+      .then(r => r.json())
+      .then(data => { if (!cancelled) setMatches(Array.isArray(data) ? data : []); })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [homeTeam, awayTeam]);
+
+  return (
+    <div className="rounded-xl border border-white/8 bg-[#111e2b] p-5">
+      <p className="text-[9px] uppercase tracking-[0.3em] text-white/30 mb-4">Tête-à-tête récent</p>
+      {loading ? (
+        <p className="text-sm text-white/30 animate-pulse">Chargement…</p>
+      ) : !matches.length ? (
+        <p className="text-sm text-white/30">Aucune confrontation trouvée.</p>
+      ) : (
+        <div className="space-y-2">
+          {matches.map((m, i) => {
+            const isOurHome = m.home === homeTeam;
+            const gf = isOurHome ? m.home_score : m.away_score;
+            const ga = isOurHome ? m.away_score : m.home_score;
+            let outcome = "N";
+            if (gf > ga) outcome = "V";
+            else if (gf < ga) outcome = "D";
+            const outcomeStyle = outcome === "V"
+              ? "border-emerald-500/30 bg-emerald-500/15 text-emerald-300"
+              : outcome === "D"
+              ? "border-rose-500/30 bg-rose-500/15 text-rose-300"
+              : "border-white/15 bg-white/8 text-white/45";
+            const dateStr = m.date ? m.date.slice(0, 10) : "";
+            return (
+              <div key={i} className="flex items-center gap-3 rounded-lg bg-white/[0.03] px-3 py-2">
+                <span className={`shrink-0 rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase ${outcomeStyle}`}>
+                  {outcome}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-white/70 truncate">
+                    {m.home} {m.home_score}–{m.away_score} {m.away}
+                  </p>
+                  <p className="text-[10px] text-white/30">{dateStr} · {m.competition_name}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── Classement ────────────────────────────────────────── */
+function StandingsSection({ competitionName, homeTeam, awayTeam }) {
+  const [table, setTable] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${API_BASE}/standings?competition=${encodeURIComponent(competitionName)}`)
+      .then(r => r.json())
+      .then(data => { if (!cancelled) setTable(Array.isArray(data) ? data : []); })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [competitionName]);
+
+  if (loading) return (
+    <div className="rounded-xl border border-white/8 bg-[#111e2b] p-5">
+      <p className="text-[9px] uppercase tracking-[0.3em] text-white/30 mb-4">Classement</p>
+      <p className="text-sm text-white/30 animate-pulse">Chargement…</p>
+    </div>
+  );
+
+  if (!table.length) return (
+    <div className="rounded-xl border border-white/8 bg-[#111e2b] p-5">
+      <p className="text-[9px] uppercase tracking-[0.3em] text-white/30 mb-4">Classement</p>
+      <p className="text-sm text-white/30">Classement non disponible pour cette compétition.</p>
+    </div>
+  );
+
+  const ht = homeTeam.toLowerCase();
+  const at = awayTeam.toLowerCase();
+
+  return (
+    <div className="rounded-xl border border-white/8 bg-[#111e2b] p-5">
+      <p className="text-[9px] uppercase tracking-[0.3em] text-white/30 mb-4">
+        Classement — {competitionName}
+      </p>
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="border-b border-white/8 text-[9px] uppercase tracking-wider text-white/25">
+              <th className="pb-2 text-center w-6">#</th>
+              <th className="pb-2 text-left pl-1">Équipe</th>
+              <th className="pb-2 text-center w-8">J</th>
+              <th className="pb-2 text-center w-8">G</th>
+              <th className="pb-2 text-center w-8">N</th>
+              <th className="pb-2 text-center w-8">P</th>
+              <th className="pb-2 text-center w-10">+/-</th>
+              <th className="pb-2 text-center w-8 text-white/50">Pts</th>
+            </tr>
+          </thead>
+          <tbody>
+            {table.map((row, i) => {
+              const name = (row.team || "").toLowerCase();
+              const isHL = name === ht || name === at;
+              return (
+                <tr key={i} className={`border-b border-white/[0.04] ${isHL ? "bg-emerald-500/8" : ""}`}>
+                  <td className="py-1.5 text-center text-white/30">{row.rank}</td>
+                  <td className={`py-1.5 pl-1 max-w-[130px] truncate ${isHL ? "font-semibold text-emerald-300" : "text-white/65"}`}>
+                    {row.team}
+                  </td>
+                  <td className="py-1.5 text-center text-white/45">{row.played}</td>
+                  <td className="py-1.5 text-center text-white/45">{row.won}</td>
+                  <td className="py-1.5 text-center text-white/45">{row.drawn}</td>
+                  <td className="py-1.5 text-center text-white/45">{row.lost}</td>
+                  <td className="py-1.5 text-center text-white/45">{row.gd}</td>
+                  <td className="py-1.5 text-center font-bold text-white">{row.points}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
 
 function Logo({ size = 26 }) {
   return (
@@ -117,9 +254,15 @@ export default function MatchDetail() {
           <span className="brand-text text-base font-bold">{BRAND}</span>
         </div>
 
-        <div className="ml-auto">
-          <span className={`rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wide ${meta.badge}`}>
-            {insufficient ? "Données insuffisantes" : match.trust_level || "—"}
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            onClick={() => navigate("/", { state: { openBet: match } })}
+            className="btn-green rounded-lg px-3 py-1.5 text-xs font-semibold text-white"
+          >
+            Parier
+          </button>
+          <span className={`rounded-full border px-2 py-1 text-[10px] font-bold uppercase tracking-wide ${meta.badge}`}>
+            {insufficient ? "Insuff." : match.trust_level || "—"}
           </span>
         </div>
       </header>
@@ -141,26 +284,26 @@ export default function MatchDetail() {
                 {match.competition_name || "Match"} · {match.date || "Date indisponible"}
               </p>
 
-              <div className="mt-5 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                {/* Teams */}
-                <div className="flex items-center gap-4 md:gap-6">
+              <div className="mt-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                {/* Teams — vertical sur mobile, horizontal sur desktop */}
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
                   <div className="flex items-center gap-3">
-                    <TeamLogo name={match.home_team} logo={match.home_badge} size="h-14 w-14" />
+                    <TeamLogo name={match.home_team} logo={match.home_badge} size="h-12 w-12 sm:h-14 sm:w-14" />
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-white/30">Domicile</p>
-                      <h1 className="text-xl font-bold text-white md:text-3xl">{match.home_team}</h1>
+                      <h1 className="text-lg font-bold text-white sm:text-2xl md:text-3xl">{match.home_team}</h1>
                     </div>
                   </div>
 
-                  <div className="rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-bold tracking-[0.4em] text-white/35">
+                  <div className="self-start sm:self-auto rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm font-bold tracking-[0.4em] text-white/35">
                     VS
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <TeamLogo name={match.away_team} logo={match.away_badge} size="h-14 w-14" />
+                    <TeamLogo name={match.away_team} logo={match.away_badge} size="h-12 w-12 sm:h-14 sm:w-14" />
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-white/30">Extérieur</p>
-                      <h1 className="text-xl font-bold text-white md:text-3xl">{match.away_team}</h1>
+                      <h1 className="text-lg font-bold text-white sm:text-2xl md:text-3xl">{match.away_team}</h1>
                     </div>
                   </div>
                 </div>
@@ -339,6 +482,16 @@ export default function MatchDetail() {
 
             </div>
           )}
+
+          {/* H2H + Classement */}
+          <div className="anim-fade-up grid gap-4 xl:grid-cols-2" style={{ animationDelay: "280ms" }}>
+            <H2HSection homeTeam={match.home_team} awayTeam={match.away_team} />
+            <StandingsSection
+              competitionName={match.competition_name}
+              homeTeam={match.home_team}
+              awayTeam={match.away_team}
+            />
+          </div>
 
           {/* Footer */}
           <div className="flex items-center justify-center gap-2 py-4 text-center">

@@ -49,8 +49,8 @@ export function useBets() {
 
   async function updateResult(id, result) {
     const bet  = bets.find((b) => b.id === id);
-    const profit = result === "WIN"
-      ? parseFloat(((bet.odds - 1) * bet.stake).toFixed(2))
+    const profit = result == null ? null
+      : result === "WIN"  ? parseFloat(((bet.odds - 1) * bet.stake).toFixed(2))
       : result === "LOSS" ? -parseFloat(bet.stake)
       : 0;
 
@@ -64,7 +64,7 @@ export function useBets() {
   }
 
   async function autoEvaluate() {
-    const pending = bets.filter((b) => !b.result);
+    const pending = bets.filter((b) => !b.result && b.type !== "multiple");
     if (pending.length === 0) return { evaluated: 0 };
 
     const results = await fetch(`${API_BASE}/results/evaluated?days=30`).then((r) => r.json()).catch(() => []);
