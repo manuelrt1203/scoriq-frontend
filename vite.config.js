@@ -41,6 +41,7 @@ export default defineConfig({
             handler: 'NetworkFirst',
             options: {
               cacheName: 'scoriq-api',
+              networkTimeoutSeconds: 10,
               expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 },
             },
           },

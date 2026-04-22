@@ -739,27 +739,48 @@ function ButsTab({ summary, loading }) {
    HISTORIQUE TAB
    ============================================================ */
 
-function HistoriqueTab() {
-  const [history,    setHistory]    = useState([]);
-  const [loading,    setLoading]    = useState(true);
-  const [error,      setError]      = useState("");
-  const [filterH,    setFilterH]    = useState("ALL");   // ALL | CORRECT | WRONG
-  const [filterTrust, setFilterTrust] = useState("ALL"); // ALL | FORTE | MOYENNE | FAIBLE
-  const [searchH,    setSearchH]    = useState("");
+const HIST_PAGE = 50;
 
-  useEffect(() => {
-    setLoading(true);
-    fetch(`${API_BASE}/predictions/history?limit=200&only_evaluated=true`)
+function HistoriqueTab() {
+  const [history,     setHistory]     = useState([]);
+  const [loading,     setLoading]     = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore,     setHasMore]     = useState(true);
+  const [offset,      setOffset]      = useState(0);
+  const [error,       setError]       = useState("");
+  const [filterH,     setFilterH]     = useState("ALL");
+  const [filterTrust, setFilterTrust] = useState("ALL");
+  const [filterPeriod, setFilterPeriod] = useState("ALL"); // ALL | 30d | 7d
+  const [searchH,     setSearchH]     = useState("");
+
+  function fetchPage(off, reset = false) {
+    if (reset) setLoading(true); else setLoadingMore(true);
+    fetch(`${API_BASE}/predictions/history?limit=${HIST_PAGE}&offset=${off}&only_evaluated=true`)
       .then((r) => r.json())
-      .then((data) => { setHistory(Array.isArray(data) ? data : []); setLoading(false); })
-      .catch(() => { setError("Impossible de charger l'historique."); setLoading(false); });
-  }, []);
+      .then((data) => {
+        const rows = Array.isArray(data) ? data : [];
+        setHistory((prev) => reset ? rows : [...prev, ...rows]);
+        setHasMore(rows.length === HIST_PAGE);
+        setOffset(off + rows.length);
+      })
+      .catch(() => { if (reset) setError("Impossible de charger l'historique."); })
+      .finally(() => { reset ? setLoading(false) : setLoadingMore(false); });
+  }
+
+  useEffect(() => { fetchPage(0, true); }, []);
 
   const filtered = useMemo(() => {
     let items = [...history];
     if (filterH === "CORRECT") items = items.filter((r) => r.is_correct_1x2 === 1);
     if (filterH === "WRONG")   items = items.filter((r) => r.is_correct_1x2 === 0);
     if (filterTrust !== "ALL") items = items.filter((r) => r.trust_level === filterTrust);
+    if (filterPeriod !== "ALL") {
+      const days = filterPeriod === "7d" ? 7 : 30;
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - days);
+      const cutoffStr = cutoff.toISOString().slice(0, 10);
+      items = items.filter((r) => r.match_date >= cutoffStr);
+    }
     if (searchH.trim()) {
       const q = searchH.trim().toLowerCase();
       items = items.filter((r) =>
@@ -843,8 +864,16 @@ function HistoriqueTab() {
             </button>
           ))}
         </div>
+        <div className="flex gap-1.5">
+          {[["ALL","Tout"],["30d","30 derniers jours"],["7d","7 derniers jours"]].map(([v,l]) => (
+            <button key={v} onClick={() => setFilterPeriod(v)}
+              className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${filterPeriod===v ? "border-emerald-500/35 bg-emerald-500/12 text-emerald-300" : "border-white/8 bg-white/[0.04] text-white/40 hover:text-white/70"}`}>
+              {l}
+            </button>
+          ))}
+        </div>
         {filtered.length !== history.length && (
-          <span className="text-xs text-white/30">{filtered.length} / {history.length}</span>
+          <span className="text-xs text-white/30">{filtered.length} / {history.length} chargés</span>
         )}
       </div>
 
@@ -981,6 +1010,19 @@ function HistoriqueTab() {
             })}
           </div>
         ))
+      )}
+
+      {/* Charger plus */}
+      {hasMore && !searchH && filterH === "ALL" && filterTrust === "ALL" && filterPeriod === "ALL" && (
+        <div className="flex justify-center pt-2">
+          <button
+            onClick={() => fetchPage(offset)}
+            disabled={loadingMore}
+            className="rounded-lg border border-white/10 bg-white/[0.04] px-5 py-2 text-xs font-semibold text-white/50 transition hover:bg-white/[0.08] hover:text-white/80 disabled:opacity-40"
+          >
+            {loadingMore ? "Chargement…" : `Charger plus (${HIST_PAGE} suivants)`}
+          </button>
+        </div>
       )}
     </div>
   );
@@ -1469,7 +1511,7 @@ function DashboardPage() {
    APP ROUTER
    ============================================================ */
 export default function App() {
-  const { user, loading } = useAuth();
+  const { user, loading, passwordRecovery } = useAuth();
 
   if (loading) {
     return (
@@ -1479,7 +1521,7 @@ export default function App() {
     );
   }
 
-  if (!user) return <AuthPage />;
+  if (passwordRecovery || !user) return <AuthPage />;
 
   return (
     <Routes>
