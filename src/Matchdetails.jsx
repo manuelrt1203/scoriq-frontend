@@ -486,11 +486,13 @@ export default function MatchDetail() {
           {/* H2H + Classement */}
           <div className="anim-fade-up grid gap-4 xl:grid-cols-2" style={{ animationDelay: "280ms" }}>
             <H2HSection homeTeam={match.home_team} awayTeam={match.away_team} />
-            <StandingsSection
-              competitionName={match.competition_name}
-              homeTeam={match.home_team}
-              awayTeam={match.away_team}
-            />
+            {match.competition_type === "LEAGUE" && (
+              <StandingsSection
+                competitionName={match.competition_name}
+                homeTeam={match.home_team}
+                awayTeam={match.away_team}
+              />
+            )}
           </div>
 
           {/* Footer */}
