@@ -961,11 +961,11 @@ function HistoriqueTab() {
                     </div>
                   </div>
 
-                  {/* Mobile: compact summary */}
-                  <div className="flex items-center gap-2 sm:hidden text-xs text-white/50">
-                    <span>{pickLabel(r.top_pick)} → <span className={ok1x2 ? "text-emerald-300" : "text-rose-300"}>{realResult}</span></span>
-                    <span className="text-white/20">·</span>
-                    <span className="tabular-nums">{predScore} → <span className={okScore ? "text-emerald-300" : "text-white/50"}>{realScore}</span></span>
+                  {/* Mobile: compact summary — w-full force new line */}
+                  <div className="flex w-full items-center gap-2 pl-14 sm:hidden text-xs text-white/50">
+                    <span className="truncate"><span className="text-white/40">{pickLabel(r.top_pick)}</span> → <span className={ok1x2 ? "text-emerald-300 font-semibold" : "text-rose-300 font-semibold"}>{realResult}</span></span>
+                    <span className="text-white/20 shrink-0">·</span>
+                    <span className="tabular-nums shrink-0">{predScore} → <span className={okScore ? "text-emerald-300 font-semibold" : "text-white/50"}>{realScore}</span></span>
                   </div>
 
                   {/* Confidence */}
