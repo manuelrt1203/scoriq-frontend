@@ -1444,6 +1444,16 @@ function DashboardPage() {
               <span className="text-[9px] font-semibold uppercase tracking-wide">{label}</span>
             </button>
           ))}
+          {/* Compte */}
+          <button
+            onClick={() => setAccountOpen(true)}
+            className="flex flex-1 flex-col items-center justify-center gap-0.5 transition-colors text-white/30 hover:text-white/55"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+            <span className="text-[9px] font-semibold uppercase tracking-wide">Compte</span>
+          </button>
         </nav>
 
         {/* ── RIGHT PANEL ── */}

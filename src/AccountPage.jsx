@@ -142,7 +142,7 @@ export default function AccountPage({ onClose }) {
 
       {/* Panel */}
       <div
-        className="relative flex h-full w-full flex-col overflow-y-auto sm:max-w-md anim-slide-right"
+        className="relative flex h-full w-full flex-col overflow-y-auto sm:max-w-md anim-slide-right pb-16 sm:pb-0"
         style={{ backgroundColor: "var(--bg-base)" }}
       >
         {/* Header */}
