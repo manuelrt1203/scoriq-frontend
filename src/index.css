@@ -62,9 +62,45 @@
 [data-theme="light"] .text-white\/15 { color: var(--text-faint)     !important; }
 [data-theme="light"] .text-white     { color: var(--text-primary)   !important; }
 
-/* Light mode — override dark background classes */
+/* Light mode — fonds hardcodés → variables */
 [data-theme="light"] body,
 [data-theme="light"] #root { background-color: var(--bg-base); }
+
+/* Surface principale (#111e2b et variantes) */
+[data-theme="light"] .bg-\[#111e2b\],
+[data-theme="light"] .bg-\[#0f1926\],
+[data-theme="light"] .bg-\[#0d1a26\],
+[data-theme="light"] .bg-\[#131f2e\],
+[data-theme="light"] .bg-\[#162130\] { background-color: var(--bg-surface) !important; }
+
+/* Fond de base (#0d1520, #091624 et variantes avec opacité) */
+[data-theme="light"] .bg-\[#0d1520\],
+[data-theme="light"] .bg-\[#091624\],
+[data-theme="light"] .bg-\[#0d1520\]\/95 { background-color: var(--bg-base) !important; }
+
+/* Bordures blanches → bordures light */
+[data-theme="light"] .border-white\/8   { border-color: var(--border)        !important; }
+[data-theme="light"] .border-white\/10  { border-color: var(--border)        !important; }
+[data-theme="light"] .border-white\/\[0\.06\] { border-color: var(--border-subtle) !important; }
+[data-theme="light"] .border-white\/\[0\.05\] { border-color: var(--border-subtle) !important; }
+
+/* Hover backgrounds */
+[data-theme="light"] .hover\:bg-white\/\[0\.05\]:hover,
+[data-theme="light"] .hover\:bg-white\/\[0\.06\]:hover,
+[data-theme="light"] .hover\:bg-white\/\[0\.08\]:hover,
+[data-theme="light"] .hover\:bg-white\/\[0\.09\]:hover { background-color: rgba(0,0,0,0.05) !important; }
+
+/* Fond semi-transparent des overlays */
+[data-theme="light"] .bg-white\/\[0\.04\] { background-color: rgba(0,0,0,0.04) !important; }
+[data-theme="light"] .bg-white\/\[0\.05\] { background-color: rgba(0,0,0,0.05) !important; }
+
+/* Badges picks (confiance) — gardent leur couleur propre */
+[data-theme="light"] .bg-emerald-500\/8  { background-color: rgba(16,185,129,0.10) !important; }
+[data-theme="light"] .bg-amber-500\/8    { background-color: rgba(245,158,11,0.10) !important; }
+
+/* Texte blanc pur sur boutons colorés — rester blanc */
+[data-theme="light"] .btn-green,
+[data-theme="light"] .btn-green span { color: #ffffff !important; }
 
 /* ============================================================
    ACCENT UTILITIES (remplacent les classes emerald hardcodées)
