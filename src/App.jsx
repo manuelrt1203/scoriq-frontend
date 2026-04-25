@@ -187,61 +187,17 @@ function LangToggle({ lang, toggleLang }) {
 /* ============================================================
    USER MENU
    ============================================================ */
-function UserMenu({ user, signOut, onOpenAccount, t }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    function handler(e) {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
-    }
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
+function UserMenu({ user, onOpenAccount }) {
   const initial = (user?.email?.[0] || "?").toUpperCase();
-
   return (
-    <div ref={ref} className="relative">
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex h-8 w-8 items-center justify-center rounded-full border text-sm font-bold text-white transition accent-bg-subtle accent-border hover:accent-bg-subtle-2"
-        style={{ color: "var(--accent-light)" }}
-      >
-        {initial}
-      </button>
-      {open && (
-        <div
-          className="absolute right-0 top-full mt-2 w-52 overflow-hidden rounded-xl border shadow-2xl z-50 anim-slide-down"
-          style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)" }}
-        >
-          <div className="border-b px-4 py-3" style={{ borderColor: "var(--border-subtle)" }}>
-            <p className="text-[10px] uppercase tracking-widest text-white/30">{t.header.account}</p>
-            <p className="mt-0.5 truncate text-xs text-white/60">{user?.email}</p>
-          </div>
-          <div className="p-1.5">
-            <button
-              onClick={() => { onOpenAccount(); setOpen(false); }}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm text-white/50 transition hover:bg-white/[0.05] hover:text-white/80"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-              </svg>
-              Mon compte
-            </button>
-            <button
-              onClick={() => { signOut(); setOpen(false); }}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm text-white/50 transition hover:bg-white/[0.05] hover:text-rose-300"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
-              {t.header.signout}
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+    <button
+      onClick={onOpenAccount}
+      title="Mon compte"
+      className="flex h-8 w-8 items-center justify-center rounded-full border text-sm font-bold transition accent-bg-subtle accent-border hover:accent-bg-subtle-2"
+      style={{ color: "var(--accent-light)" }}
+    >
+      {initial}
+    </button>
   );
 }
 
@@ -1240,7 +1196,7 @@ function DashboardPage() {
             <span className="sm:hidden">{predicting ? "…" : t.header.run}</span>
             <span className="hidden sm:inline">{predicting ? t.header.running : t.header.run_full}</span>
           </button>
-          <UserMenu user={user} signOut={signOut} onOpenAccount={() => setAccountOpen(true)} t={t} />
+          <UserMenu user={user} onOpenAccount={() => setAccountOpen(true)} />
         </div>
       </header>
 
