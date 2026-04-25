@@ -1,13 +1,81 @@
 @import "tailwindcss";
 
+/* ============================================================
+   THEME VARIABLES
+   ============================================================ */
+
 :root {
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: rgba(255, 255, 255, 0.88);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Dark theme (default) */
+  --bg-base:        #0d1520;
+  --bg-surface:     #111e2b;
+  --bg-surface-alt: #0d1a26;
+  --bg-nav:         #091624;
+  --text-primary:   rgba(255, 255, 255, 0.88);
+  --text-secondary: rgba(255, 255, 255, 0.5);
+  --text-muted:     rgba(255, 255, 255, 0.3);
+  --text-faint:     rgba(255, 255, 255, 0.15);
+  --border:         rgba(255, 255, 255, 0.08);
+  --border-subtle:  rgba(255, 255, 255, 0.06);
+
+  /* Accent — green par défaut (écrasé dynamiquement via JS) */
+  --accent:         #10b981;
+  --accent-light:   #34d399;
+  --accent-lighter: #6ee7b7;
+  --accent-dark:    #059669;
+  --accent-rgb:     16, 185, 129;
+
+  color: var(--text-primary);
 }
+
+/* Light theme overrides */
+[data-theme="light"] {
+  --bg-base:        #f0f4f8;
+  --bg-surface:     #ffffff;
+  --bg-surface-alt: #f8fafc;
+  --bg-nav:         #e8edf3;
+  --text-primary:   #0f172a;
+  --text-secondary: #475569;
+  --text-muted:     #94a3b8;
+  --text-faint:     #cbd5e1;
+  --border:         rgba(0, 0, 0, 0.08);
+  --border-subtle:  rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+}
+
+/* Light mode — override hardcoded Tailwind white text */
+[data-theme="light"] .text-white\/88 { color: var(--text-primary)   !important; }
+[data-theme="light"] .text-white\/80 { color: var(--text-primary)   !important; }
+[data-theme="light"] .text-white\/70 { color: var(--text-secondary) !important; }
+[data-theme="light"] .text-white\/60 { color: var(--text-secondary) !important; }
+[data-theme="light"] .text-white\/50 { color: var(--text-secondary) !important; }
+[data-theme="light"] .text-white\/45 { color: var(--text-secondary) !important; }
+[data-theme="light"] .text-white\/40 { color: var(--text-muted)     !important; }
+[data-theme="light"] .text-white\/30 { color: var(--text-muted)     !important; }
+[data-theme="light"] .text-white\/25 { color: var(--text-muted)     !important; }
+[data-theme="light"] .text-white\/20 { color: var(--text-faint)     !important; }
+[data-theme="light"] .text-white\/15 { color: var(--text-faint)     !important; }
+[data-theme="light"] .text-white     { color: var(--text-primary)   !important; }
+
+/* Light mode — override dark background classes */
+[data-theme="light"] body,
+[data-theme="light"] #root { background-color: var(--bg-base); }
+
+/* ============================================================
+   ACCENT UTILITIES (remplacent les classes emerald hardcodées)
+   ============================================================ */
+
+.accent-text         { color: var(--accent-light); }
+.accent-text-strong  { color: var(--accent-lighter); }
+.accent-bg-subtle    { background-color: rgba(var(--accent-rgb), 0.12); }
+.accent-bg-subtle-2  { background-color: rgba(var(--accent-rgb), 0.25); }
+.accent-border       { border-color: rgba(var(--accent-rgb), 0.30); }
+.accent-border-strong{ border-color: rgba(var(--accent-rgb), 0.45); }
 
 * { box-sizing: border-box; }
 
@@ -32,11 +100,11 @@ img { display: block; max-width: 100%; }
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(16, 185, 129, 0.2);
+  background: rgba(var(--accent-rgb), 0.2);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(16, 185, 129, 0.4);
+  background: rgba(var(--accent-rgb), 0.4);
 }
 
 /* ============================================================
@@ -74,25 +142,31 @@ img { display: block; max-width: 100%; }
 }
 
 @keyframes glowPulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(16,185,129,0.3); }
-  50%       { box-shadow: 0 0 20px rgba(16,185,129,0.55); }
+  0%, 100% { box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.3); }
+  50%       { box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.55); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 /* ============================================================
    ANIMATION CLASSES
    ============================================================ */
 
-.anim-fade-up    { animation: fadeInUp   0.4s ease-out both; }
-.anim-fade-in    { animation: fadeIn     0.3s ease-out both; }
+.anim-fade-up    { animation: fadeInUp    0.4s  ease-out both; }
+.anim-fade-in    { animation: fadeIn     0.3s  ease-out both; }
 .anim-slide-left { animation: slideInLeft 0.4s ease-out both; }
 .anim-slide-down { animation: slideDown  0.35s ease-out both; }
+.anim-slide-right{ animation: slideInRight 0.3s ease-out both; }
 
 /* ============================================================
-   BRAND GRADIENT TEXT (Green)
+   BRAND GRADIENT TEXT (accent)
    ============================================================ */
 
 .brand-text {
-  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent-dark) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -124,13 +198,13 @@ img { display: block; max-width: 100%; }
    ============================================================ */
 
 .btn-green {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent-dark) 100%);
   transition: filter 0.15s, transform 0.15s, box-shadow 0.15s;
 }
 .btn-green:hover:not(:disabled) {
   filter: brightness(1.12);
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(16,185,129,0.35);
+  box-shadow: 0 6px 18px rgba(var(--accent-rgb), 0.35);
 }
 .btn-green:active:not(:disabled) {
   transform: translateY(0);

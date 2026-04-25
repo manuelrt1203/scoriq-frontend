@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
 import Matchdetails from "./Matchdetails.jsx";
 import AuthPage from "./AuthPage.jsx";
+import AccountPage from "./AccountPage.jsx";
 import { useAuth } from "./lib/AuthContext.jsx";
 import { useFavorites } from "./lib/useFavorites.js";
 import FavorisManager from "./FavorisManager.jsx";
@@ -176,9 +177,9 @@ function LangToggle({ lang, toggleLang }) {
       className="flex items-center gap-px rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs font-bold transition hover:bg-white/[0.08]"
       title="Changer de langue / Switch language"
     >
-      <span className={lang === "fr" ? "text-emerald-300" : "text-white/30"}>FR</span>
+      <span className={lang === "fr" ? "accent-text" : "text-white/30"}>FR</span>
       <span className="mx-1 text-white/20">·</span>
-      <span className={lang === "en" ? "text-emerald-300" : "text-white/30"}>EN</span>
+      <span className={lang === "en" ? "accent-text" : "text-white/30"}>EN</span>
     </button>
   );
 }
@@ -186,7 +187,7 @@ function LangToggle({ lang, toggleLang }) {
 /* ============================================================
    USER MENU
    ============================================================ */
-function UserMenu({ user, signOut, t }) {
+function UserMenu({ user, signOut, onOpenAccount, t }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -204,17 +205,30 @@ function UserMenu({ user, signOut, t }) {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex h-8 w-8 items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/15 text-sm font-bold text-emerald-300 transition hover:bg-emerald-500/25"
+        className="flex h-8 w-8 items-center justify-center rounded-full border text-sm font-bold text-white transition accent-bg-subtle accent-border hover:accent-bg-subtle-2"
+        style={{ color: "var(--accent-light)" }}
       >
         {initial}
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-52 overflow-hidden rounded-xl border border-white/10 bg-[#111e2b] shadow-2xl z-50 anim-slide-down">
-          <div className="border-b border-white/[0.06] px-4 py-3">
+        <div
+          className="absolute right-0 top-full mt-2 w-52 overflow-hidden rounded-xl border shadow-2xl z-50 anim-slide-down"
+          style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)" }}
+        >
+          <div className="border-b px-4 py-3" style={{ borderColor: "var(--border-subtle)" }}>
             <p className="text-[10px] uppercase tracking-widest text-white/30">{t.header.account}</p>
             <p className="mt-0.5 truncate text-xs text-white/60">{user?.email}</p>
           </div>
           <div className="p-1.5">
+            <button
+              onClick={() => { onOpenAccount(); setOpen(false); }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm text-white/50 transition hover:bg-white/[0.05] hover:text-white/80"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+              Mon compte
+            </button>
             <button
               onClick={() => { signOut(); setOpen(false); }}
               className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm text-white/50 transition hover:bg-white/[0.05] hover:text-rose-300"
@@ -240,14 +254,14 @@ function OddsButton({ label, value, isTop }) {
     <div
       className={`flex h-[48px] w-[52px] flex-col items-center justify-center gap-0.5 rounded-lg border select-none transition-all duration-150 sm:h-[52px] sm:w-[60px] ${
         isTop
-          ? "odds-active border-emerald-500/45 bg-emerald-500/15"
+          ? "odds-active accent-border-strong accent-bg-subtle"
           : "border-white/10 bg-white/[0.05] hover:border-white/20 hover:bg-white/[0.09]"
       }`}
     >
-      <span className={`text-[9px] font-semibold uppercase tracking-wide sm:text-[10px] ${isTop ? "text-emerald-400" : "text-white/35"}`}>
+      <span className={`text-[9px] font-semibold uppercase tracking-wide sm:text-[10px] ${isTop ? "accent-text" : "text-white/35"}`}>
         {label}
       </span>
-      <span className={`text-[13px] font-bold tabular-nums sm:text-[15px] ${isTop ? "text-emerald-200" : "text-white/80"}`}>
+      <span className={`text-[13px] font-bold tabular-nums sm:text-[15px] ${isTop ? "accent-text-strong" : "text-white/80"}`}>
         {pct}%
       </span>
     </div>
@@ -1069,6 +1083,8 @@ function DashboardPage() {
   const [favAlerts,  setFavAlerts]  = useState([]);
   const [lastRunAt,  setLastRunAt]  = useState("");
 
+  const [accountOpen, setAccountOpen] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -1169,11 +1185,12 @@ function DashboardPage() {
 
   /* ── RENDER ── */
   return (
-    <div className="flex flex-col bg-[#0d1520] text-white" style={{ height: "100dvh", overflow: "hidden" }}>
+    <div className="flex flex-col" style={{ height: "100dvh", overflow: "hidden", backgroundColor: "var(--bg-base)", color: "var(--text-primary)" }}>
       {betMatch && <BetModal match={betMatch} allMatches={matches} onAdd={addBet} onClose={() => setBetMatch(null)} />}
+      {accountOpen && <AccountPage onClose={() => setAccountOpen(false)} />}
 
       {/* ════════════════════ TOP NAV ════════════════════ */}
-      <header className="anim-slide-down flex h-[56px] shrink-0 items-center gap-3 border-b border-white/8 bg-[#091624] px-4">
+      <header className="anim-slide-down flex h-[56px] shrink-0 items-center gap-3 border-b px-4" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)" }}>
 
         {/* Brand */}
         <div className="flex items-center gap-2.5 mr-2 shrink-0">
@@ -1189,7 +1206,7 @@ function DashboardPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`shrink-0 rounded-lg px-3.5 py-2 text-[13px] font-medium transition whitespace-nowrap ${
                 activeTab === tab.id
-                  ? "bg-emerald-500/12 text-emerald-300"
+                  ? "accent-bg-subtle accent-text"
                   : "text-white/40 hover:bg-white/[0.05] hover:text-white/70"
               }`}
             >
@@ -1223,7 +1240,7 @@ function DashboardPage() {
             <span className="sm:hidden">{predicting ? "…" : t.header.run}</span>
             <span className="hidden sm:inline">{predicting ? t.header.running : t.header.run_full}</span>
           </button>
-          <UserMenu user={user} signOut={signOut} t={t} />
+          <UserMenu user={user} signOut={signOut} onOpenAccount={() => setAccountOpen(true)} t={t} />
         </div>
       </header>
 
@@ -1264,11 +1281,11 @@ function DashboardPage() {
           {/* Sports */}
           <div className="p-3">
             <p className="mb-2 px-2 text-[9px] uppercase tracking-[0.35em] text-white/25">{t.sidebar.sports}</p>
-            <div className="flex items-center gap-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-3 py-2.5">
+            <div className="flex items-center gap-2.5 rounded-lg accent-bg-subtle accent-border border px-3 py-2.5">
               <span className="text-base leading-none">⚽</span>
               <span className="text-sm font-semibold text-white/88">Football</span>
               {matches.length > 0 && (
-                <span className="ml-auto rounded-full bg-emerald-500/25 px-2 py-0.5 text-xs font-bold text-emerald-300">
+                <span className="ml-auto rounded-full accent-bg-subtle-2 accent-text px-2 py-0.5 text-xs font-bold">
                   {matches.length}
                 </span>
               )}
@@ -1414,13 +1431,13 @@ function DashboardPage() {
         </main>
 
         {/* ── MOBILE BOTTOM NAV ── */}
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 flex h-14 items-stretch border-t border-white/10 bg-[#091624]">
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 flex h-14 items-stretch border-t border-white/10" style={{ backgroundColor: "var(--bg-nav)" }}>
           {getMobileNav(t).map(({ id, label, icon }) => (
             <button
               key={id}
               onClick={() => setActiveTab(id)}
               className={`flex flex-1 flex-col items-center justify-center gap-0.5 transition-colors ${
-                activeTab === id ? "text-emerald-400" : "text-white/30 hover:text-white/55"
+                activeTab === id ? "accent-text" : "text-white/30 hover:text-white/55"
               }`}
             >
               {icon}
@@ -1433,7 +1450,7 @@ function DashboardPage() {
         <aside className="hidden w-[256px] shrink-0 overflow-y-auto border-l border-white/8 p-4 xl:block space-y-4">
 
           {/* Mini stats */}
-          <div className="rounded-xl border border-white/8 bg-[#111e2b] p-4">
+          <div className="rounded-xl border border-white/8 p-4" style={{ backgroundColor: "var(--bg-surface)" }}>
             <p className="mb-3 text-[10px] uppercase tracking-[0.3em] text-white/30">{t.sidebar.performances}</p>
             {[
               ["Accuracy 1X2",    summary ? formatPercent(summary.accuracy_1x2)      : "—"],
@@ -1452,7 +1469,7 @@ function DashboardPage() {
           </div>
 
           {/* Top picks mini */}
-          <div className="rounded-xl border border-white/8 bg-[#111e2b] p-4">
+          <div className="rounded-xl border border-white/8 p-4" style={{ backgroundColor: "var(--bg-surface)" }}>
             <p className="mb-3 text-[10px] uppercase tracking-[0.3em] text-white/30">{t.sidebar.top_picks}</p>
             {topPicks.length === 0 ? (
               <p className="text-xs text-white/30">{t.sidebar.no_picks}</p>
