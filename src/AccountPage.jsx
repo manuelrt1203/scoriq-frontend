@@ -83,6 +83,7 @@ export default function AccountPage({ onClose }) {
   const [saving,      setSaving]      = useState(false);
   const [saveOk,      setSaveOk]      = useState(false);
   const [uploading,   setUploading]   = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const [notify,      setNotify]      = useState(false);
   const [showPw,      setShowPw]      = useState(false);
   const [newPw,       setNewPw]       = useState("");
@@ -108,8 +109,10 @@ export default function AccountPage({ onClose }) {
 
   async function handleUpload(file) {
     setUploading(true);
-    await uploadAvatar(file);
+    setUploadError("");
+    const err = await uploadAvatar(file);
     setUploading(false);
+    if (err) setUploadError(err.message || "Erreur upload");
   }
 
   async function handleNotifyToggle(val) {
@@ -170,6 +173,9 @@ export default function AccountPage({ onClose }) {
             {/* Avatar + identité */}
             <div className="border-b px-5 py-5" style={{ borderColor: "var(--border)" }}>
               <AvatarBlock profile={profile} user={user} onUpload={handleUpload} uploading={uploading} />
+              {uploadError && (
+                <p className="mt-2 text-xs text-rose-400">{uploadError}</p>
+              )}
             </div>
 
             {/* ── Profil ── */}
