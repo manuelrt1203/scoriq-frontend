@@ -51,16 +51,38 @@
 /* Light mode — override hardcoded Tailwind white text */
 [data-theme="light"] .text-white\/88 { color: var(--text-primary)   !important; }
 [data-theme="light"] .text-white\/80 { color: var(--text-primary)   !important; }
+[data-theme="light"] .text-white\/75 { color: var(--text-primary)   !important; }
 [data-theme="light"] .text-white\/70 { color: var(--text-secondary) !important; }
+[data-theme="light"] .text-white\/65 { color: var(--text-secondary) !important; }
 [data-theme="light"] .text-white\/60 { color: var(--text-secondary) !important; }
+[data-theme="light"] .text-white\/55 { color: var(--text-secondary) !important; }
 [data-theme="light"] .text-white\/50 { color: var(--text-secondary) !important; }
 [data-theme="light"] .text-white\/45 { color: var(--text-secondary) !important; }
 [data-theme="light"] .text-white\/40 { color: var(--text-muted)     !important; }
+[data-theme="light"] .text-white\/35 { color: var(--text-muted)     !important; }
 [data-theme="light"] .text-white\/30 { color: var(--text-muted)     !important; }
 [data-theme="light"] .text-white\/25 { color: var(--text-muted)     !important; }
 [data-theme="light"] .text-white\/20 { color: var(--text-faint)     !important; }
 [data-theme="light"] .text-white\/15 { color: var(--text-faint)     !important; }
+[data-theme="light"] .text-white\/10 { color: var(--text-faint)     !important; }
 [data-theme="light"] .text-white     { color: var(--text-primary)   !important; }
+
+/* Light mode — couleurs vives → variantes sombres lisibles */
+[data-theme="light"] .text-emerald-300,
+[data-theme="light"] .text-emerald-300\/60 { color: #047857 !important; }
+[data-theme="light"] .text-emerald-400     { color: #059669 !important; }
+
+[data-theme="light"] .text-rose-200        { color: #be123c !important; }
+[data-theme="light"] .text-rose-300        { color: #be123c !important; }
+[data-theme="light"] .text-rose-400        { color: #9f1239 !important; }
+
+[data-theme="light"] .text-amber-300       { color: #92400e !important; }
+[data-theme="light"] .text-amber-400       { color: #78350f !important; }
+[data-theme="light"] .text-amber-400\/60   { color: rgba(120,53,15,0.7) !important; }
+
+/* Accent dynamique → shade sombre en mode clair */
+[data-theme="light"] .accent-text        { color: var(--accent-dark)  !important; }
+[data-theme="light"] .accent-text-strong { color: var(--accent)       !important; }
 
 /* Light mode — fonds hardcodés → variables
    IMPORTANT: Tailwind v4 échappe le # en \# dans les noms de classe */
