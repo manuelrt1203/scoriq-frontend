@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "./lib/AuthContext";
-import { useProfile } from "./lib/useProfile";
 import { useTheme, ACCENT_OPTIONS } from "./lib/ThemeContext";
 
 /* ── Section wrapper ── */
@@ -74,9 +73,12 @@ function AvatarBlock({ profile, user, onUpload, uploading }) {
 /* ══════════════════════════════════════════════════════
    ACCOUNT PAGE
    ══════════════════════════════════════════════════════ */
-export default function AccountPage({ onClose }) {
+export default function AccountPage({ onClose, profile, onUpdateProfile, onUploadAvatar, onDeleteAccount }) {
   const { user, signOut, updatePassword } = useAuth();
-  const { profile, loading, update, uploadAvatar, deleteAccount } = useProfile();
+  const update = onUpdateProfile;
+  const uploadAvatar = onUploadAvatar;
+  const deleteAccount = onDeleteAccount;
+  const loading = !profile && !!user;
   const { accent, theme, setAccent, setTheme } = useTheme();
 
   const [username,    setUsername]    = useState("");

@@ -4,6 +4,7 @@ import Matchdetails from "./Matchdetails.jsx";
 import AuthPage from "./AuthPage.jsx";
 import AccountPage from "./AccountPage.jsx";
 import { useAuth } from "./lib/AuthContext.jsx";
+import { useProfile } from "./lib/useProfile.js";
 import { useFavorites } from "./lib/useFavorites.js";
 import FavorisManager from "./FavorisManager.jsx";
 import BetModal from "./BetModal.jsx";
@@ -187,16 +188,19 @@ function LangToggle({ lang, toggleLang }) {
 /* ============================================================
    USER MENU
    ============================================================ */
-function UserMenu({ user, onOpenAccount }) {
-  const initial = (user?.email?.[0] || "?").toUpperCase();
+function UserMenu({ user, profile, onOpenAccount }) {
+  const initial = (profile?.username?.[0] || user?.email?.[0] || "?").toUpperCase();
   return (
     <button
       onClick={onOpenAccount}
       title="Mon compte"
-      className="flex h-8 w-8 items-center justify-center rounded-full border text-sm font-bold transition accent-bg-subtle accent-border hover:accent-bg-subtle-2"
+      className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border transition accent-border hover:accent-bg-subtle-2"
       style={{ color: "var(--accent-light)" }}
     >
-      {initial}
+      {profile?.avatar_url
+        ? <img src={profile.avatar_url} alt="avatar" className="h-full w-full object-cover" />
+        : <span className="text-sm font-bold accent-bg-subtle w-full h-full flex items-center justify-center">{initial}</span>
+      }
     </button>
   );
 }
@@ -1040,6 +1044,7 @@ function DashboardPage() {
   const [lastRunAt,  setLastRunAt]  = useState("");
 
   const [accountOpen, setAccountOpen] = useState(false);
+  const { profile, update: updateProfile, uploadAvatar, deleteAccount } = useProfile();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -1143,7 +1148,7 @@ function DashboardPage() {
   return (
     <div className="flex flex-col" style={{ height: "100dvh", overflow: "hidden", backgroundColor: "var(--bg-base)", color: "var(--text-primary)" }}>
       {betMatch && <BetModal match={betMatch} allMatches={matches} onAdd={addBet} onClose={() => setBetMatch(null)} />}
-      {accountOpen && <AccountPage onClose={() => setAccountOpen(false)} />}
+      {accountOpen && <AccountPage onClose={() => setAccountOpen(false)} profile={profile} onUpdateProfile={updateProfile} onUploadAvatar={uploadAvatar} onDeleteAccount={deleteAccount} />}
 
       {/* ════════════════════ TOP NAV ════════════════════ */}
       <header className="anim-slide-down flex h-[56px] shrink-0 items-center gap-3 border-b px-4" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)" }}>
@@ -1196,7 +1201,7 @@ function DashboardPage() {
             <span className="sm:hidden">{predicting ? "…" : t.header.run}</span>
             <span className="hidden sm:inline">{predicting ? t.header.running : t.header.run_full}</span>
           </button>
-          <UserMenu user={user} onOpenAccount={() => setAccountOpen(true)} />
+          <UserMenu user={user} profile={profile} onOpenAccount={() => setAccountOpen(true)} />
         </div>
       </header>
 
