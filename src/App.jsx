@@ -1311,7 +1311,7 @@ function DashboardPage() {
         </aside>
 
         {/* ── MAIN CONTENT ── */}
-        <main className="flex-1 min-w-0 overflow-y-auto">
+        <main className="flex-1 min-w-0 overflow-y-auto xl:mr-[256px]">
 
           {/* Sticky sub-header */}
           <div className="sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b border-white/8 bg-[#0d1520]/95 px-4 py-2.5 backdrop-blur-sm">
@@ -1419,7 +1419,7 @@ function DashboardPage() {
         </nav>
 
         {/* ── RIGHT PANEL ── */}
-        <aside className="hidden w-[256px] shrink-0 overflow-y-auto border-l border-white/8 p-4 xl:block space-y-4">
+        <aside className="hidden xl:block fixed right-0 top-[56px] bottom-0 w-[256px] overflow-y-auto border-l border-white/8 p-4 z-10 space-y-4" style={{ backgroundColor: "var(--bg-base)" }}>
 
           {/* Mini stats */}
           <div className="rounded-xl border border-white/8 p-4" style={{ backgroundColor: "var(--bg-surface)" }}>
