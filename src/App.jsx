@@ -1160,7 +1160,7 @@ function DashboardPage() {
         </div>
 
         {/* Tabs — desktop only */}
-        <nav className="hidden items-center gap-0.5 overflow-x-auto lg:flex">
+        <nav className="hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto lg:flex">
           {getTabs(t).map((tab) => (
             <button
               key={tab.id}
