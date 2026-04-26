@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
 import Matchdetails from "./Matchdetails.jsx";
 import AuthPage from "./AuthPage.jsx";
@@ -1512,9 +1513,12 @@ export default function App() {
   if (passwordRecovery || !user) return <AuthPage />;
 
   return (
-    <Routes>
-      <Route path="/"          element={<DashboardPage />} />
-      <Route path="/match/:id" element={<Matchdetails />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/"          element={<DashboardPage />} />
+        <Route path="/match/:id" element={<Matchdetails />} />
+      </Routes>
+      <Analytics />
+    </>
   );
 }
