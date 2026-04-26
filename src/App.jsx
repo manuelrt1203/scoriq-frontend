@@ -1310,7 +1310,7 @@ function DashboardPage() {
         </aside>
 
         {/* ── MAIN CONTENT ── */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 min-w-0 overflow-y-auto">
 
           {/* Sticky sub-header */}
           <div className="sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b border-white/8 bg-[#0d1520]/95 px-4 py-2.5 backdrop-blur-sm">
