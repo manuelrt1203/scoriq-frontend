@@ -640,6 +640,8 @@ function ConfidenceCalibration() {
 function CompetitionStats() {
   const [data, setData]       = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useLang();
+  const ts = t.stats;
 
   useEffect(() => {
     fetch(`${API_BASE}/stats/by-competition`)
@@ -656,7 +658,7 @@ function CompetitionStats() {
     return "text-orange-400";
   };
 
-  const typeLabel = t => ({ LEAGUE: "Ligue", EUROPE: "Europe", DOMESTIC_CUP: "Coupe", INTERNATIONAL: "Intl" }[t] ?? t);
+  const typeLabel = type => ({ LEAGUE: ts.type_league, EUROPE: ts.type_europe, DOMESTIC_CUP: ts.type_cup, INTERNATIONAL: ts.type_intl }[type] ?? type);
   const typeBadge = t => ({
     LEAGUE:        "bg-blue-500/15 text-blue-300",
     EUROPE:        "bg-violet-500/15 text-violet-300",
@@ -667,25 +669,25 @@ function CompetitionStats() {
   return (
     <div className="rounded-xl border border-white/8 bg-[#111e2b] overflow-hidden">
       <div className="px-5 py-4 border-b border-white/8">
-        <p className="text-sm font-semibold text-white/80">Performance par compétition</p>
-        <p className="text-xs text-white/35 mt-0.5">Accuracy sur les prédictions évaluées</p>
+        <p className="text-sm font-semibold text-white/80">{ts.comp_title}</p>
+        <p className="text-xs text-white/35 mt-0.5">{ts.comp_sub}</p>
       </div>
 
       {loading ? (
-        <div className="px-5 py-8 text-center text-white/30 text-sm">Chargement…</div>
+        <div className="px-5 py-8 text-center text-white/30 text-sm">…</div>
       ) : data.length === 0 ? (
-        <div className="px-5 py-8 text-center text-white/30 text-sm">Aucune donnée</div>
+        <div className="px-5 py-8 text-center text-white/30 text-sm">{ts.no_data}</div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/8 text-[10px] uppercase tracking-widest text-white/30">
-                <th className="px-5 py-3 text-left">Compétition</th>
-                <th className="px-3 py-3 text-center">Éval.</th>
+                <th className="px-5 py-3 text-left">{ts.col_comp}</th>
+                <th className="px-3 py-3 text-center">{ts.col_eval}</th>
                 <th className="px-3 py-3 text-center">1X2</th>
                 <th className="px-3 py-3 text-center">BTTS</th>
                 <th className="px-3 py-3 text-center">O2.5</th>
-                <th className="px-3 py-3 text-center">FORTE</th>
+                <th className="px-3 py-3 text-center">{ts.col_forte}</th>
               </tr>
             </thead>
             <tbody>
@@ -731,17 +733,19 @@ function CompetitionStats() {
 }
 
 function StatsTab({ summary, loading }) {
+  const { t } = useLang();
+  const ts = t.stats;
   const rows = [
-    { label: "Prédictions enregistrées", value: summary?.total_predictions ?? "—",           note: "Volume total en base" },
-    { label: "Prédictions évaluées",      value: summary?.evaluated_predictions ?? "—",       note: "Confrontées au résultat réel" },
-    { label: "Accuracy 1X2",              value: formatPercent(summary?.accuracy_1x2),         note: "Issue principale correcte", hl: true },
-    { label: "Accuracy BTTS",             value: formatPercent(summary?.accuracy_btts),        note: "Les deux équipes marquent", hl: true },
-    { label: "Accuracy Over 2.5",         value: formatPercent(summary?.accuracy_over_2_5),    note: "Plus de 2 buts et demi", hl: true },
-    { label: "Accuracy Over 1.5",         value: formatPercent(summary?.accuracy_over_1_5),    note: "Plus de 1 but et demi" },
+    { label: ts.total_pred,  value: summary?.total_predictions ?? "—",           note: ts.total_pred_sub },
+    { label: ts.eval_pred,   value: summary?.evaluated_predictions ?? "—",       note: ts.eval_pred_sub },
+    { label: ts.acc_1x2,     value: formatPercent(summary?.accuracy_1x2),         note: ts.acc_1x2_sub, hl: true },
+    { label: ts.acc_btts,    value: formatPercent(summary?.accuracy_btts),        note: ts.acc_btts_sub, hl: true },
+    { label: ts.acc_over25,  value: formatPercent(summary?.accuracy_over_2_5),    note: ts.acc_over25_sub, hl: true },
+    { label: ts.acc_over15,  value: formatPercent(summary?.accuracy_over_1_5),    note: ts.acc_over15_sub },
     {
-      label: "MAE buts totaux",
+      label: ts.mae,
       value: summary?.mae_total_goals != null ? Number(summary.mae_total_goals).toFixed(2) : "—",
-      note: "Erreur moyenne sur le total de buts",
+      note: ts.mae_sub,
     },
   ];
 
@@ -771,10 +775,12 @@ function StatsTab({ summary, loading }) {
 }
 
 function ButsTab({ summary, loading }) {
+  const { t } = useLang();
+  const ts = t.stats;
   const markets = [
-    { label: "Over 1.5",  value: formatPercent(summary?.accuracy_over_1_5), note: "Précision sur + de 1 but et demi", color: "sky" },
-    { label: "Over 2.5",  value: formatPercent(summary?.accuracy_over_2_5), note: "Précision sur + de 2 buts et demi", color: "violet" },
-    { label: "BTTS — Oui", value: formatPercent(summary?.accuracy_btts),    note: "Les deux équipes marquent",          color: "rose" },
+    { label: "Over 1.5",   value: formatPercent(summary?.accuracy_over_1_5), note: ts.buts_over15_sub, color: "sky" },
+    { label: "Over 2.5",   value: formatPercent(summary?.accuracy_over_2_5), note: ts.buts_over25_sub, color: "violet" },
+    { label: "BTTS — Oui", value: formatPercent(summary?.accuracy_btts),     note: ts.buts_btts_sub,   color: "rose" },
   ];
   return (
     <div className="space-y-4">
@@ -793,7 +799,7 @@ function ButsTab({ summary, loading }) {
       </div>
 
       <div className="rounded-xl border border-white/8 bg-[#111e2b] p-5">
-        <p className="text-sm font-semibold text-white/70 mb-4">Récapitulatif visuel</p>
+        <p className="text-sm font-semibold text-white/70 mb-4">{ts.buts_visual}</p>
         <div className="space-y-4">
           <ProbBar label="Over 1.5" value={summary?.accuracy_over_1_5} colorClass="bg-gradient-to-r from-sky-400 to-cyan-500" />
           <ProbBar label="Over 2.5" value={summary?.accuracy_over_2_5} colorClass="bg-gradient-to-r from-violet-400 to-fuchsia-500" />
@@ -811,6 +817,8 @@ function ButsTab({ summary, loading }) {
 const HIST_PAGE = 50;
 
 function HistoriqueTab() {
+  const { t } = useLang();
+  const th = t.historique;
   const [history,     setHistory]     = useState([]);
   const [loading,     setLoading]     = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -832,7 +840,7 @@ function HistoriqueTab() {
         setHasMore(rows.length === HIST_PAGE);
         setOffset(off + rows.length);
       })
-      .catch(() => { if (reset) setError("Impossible de charger l'historique."); })
+      .catch(() => { if (reset) setError(th.load_error); })
       .finally(() => { reset ? setLoading(false) : setLoadingMore(false); });
   }
 
@@ -895,10 +903,10 @@ function HistoriqueTab() {
       {history.length > 0 && (
         <div className="anim-fade-up grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
-            { label: "Évalués",    value: stats.total,                   sub: "matchs notés" },
-            { label: "Corrects 1X2", value: stats.ok,                   sub: `sur ${stats.total}` },
-            { label: "Accuracy",   value: stats.total ? `${Math.round(stats.ok/stats.total*100)}%` : "—", sub: "résultat principal", hl: true },
-            { label: "Forte conf.", value: stats.forteTotal ? `${Math.round(stats.forteOk/stats.forteTotal*100)}%` : "—", sub: `${stats.forteTotal} matchs FORTE`, hl: true },
+            { label: th.evaluated,  value: stats.total,  sub: th.evaluated_sub },
+            { label: th.correct,    value: stats.ok,     sub: `/ ${stats.total}` },
+            { label: th.accuracy,   value: stats.total ? `${Math.round(stats.ok/stats.total*100)}%` : "—", sub: th.acc_sub, hl: true },
+            { label: th.forte,      value: stats.forteTotal ? `${Math.round(stats.forteOk/stats.forteTotal*100)}%` : "—", sub: `${stats.forteTotal} FORTE`, hl: true },
           ].map(({ label, value, sub, hl }) => (
             <div key={label} className={`rounded-xl border p-4 ${hl ? "border-emerald-500/20 bg-emerald-500/8" : "border-white/8 bg-[#111e2b]"}`}>
               <p className="text-[9px] uppercase tracking-widest text-white/30">{label}</p>
@@ -914,11 +922,11 @@ function HistoriqueTab() {
         <input
           value={searchH}
           onChange={(e) => setSearchH(e.target.value)}
-          placeholder="Rechercher une équipe…"
+          placeholder={th.search_ph}
           className="h-8 min-w-[180px] flex-1 max-w-xs rounded-lg border border-white/10 bg-white/[0.05] px-3 text-sm text-white placeholder:text-white/22 outline-none focus:border-emerald-500/40"
         />
         <div className="flex gap-1.5">
-          {[["ALL","Tous"],["CORRECT","✓ Corrects"],["WRONG","✗ Ratés"]].map(([v,l]) => (
+          {[["ALL", th.filter_all],["CORRECT", th.filter_ok],["WRONG", th.filter_wrong]].map(([v,l]) => (
             <button key={v} onClick={() => setFilterH(v)}
               className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${filterH===v ? "border-emerald-500/35 bg-emerald-500/12 text-emerald-300" : "border-white/8 bg-white/[0.04] text-white/40 hover:text-white/70"}`}>
               {l}
@@ -926,7 +934,7 @@ function HistoriqueTab() {
           ))}
         </div>
         <div className="flex gap-1.5">
-          {[["ALL","Toute conf."],["FORTE","Forte"],["MOYENNE","Moy."],["FAIBLE","Faible"]].map(([v,l]) => (
+          {[["ALL", th.conf_all],["FORTE", th.conf_high],["MOYENNE", th.conf_med],["FAIBLE", th.conf_low]].map(([v,l]) => (
             <button key={v} onClick={() => setFilterTrust(v)}
               className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${filterTrust===v ? "border-emerald-500/35 bg-emerald-500/12 text-emerald-300" : "border-white/8 bg-white/[0.04] text-white/40 hover:text-white/70"}`}>
               {l}
@@ -934,7 +942,7 @@ function HistoriqueTab() {
           ))}
         </div>
         <div className="flex gap-1.5">
-          {[["ALL","Tout"],["30d","30 derniers jours"],["7d","7 derniers jours"]].map(([v,l]) => (
+          {[["ALL", th.period_all],["30d", th.period_30d],["7d", th.period_7d]].map(([v,l]) => (
             <button key={v} onClick={() => setFilterPeriod(v)}
               className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${filterPeriod===v ? "border-emerald-500/35 bg-emerald-500/12 text-emerald-300" : "border-white/8 bg-white/[0.04] text-white/40 hover:text-white/70"}`}>
               {l}
@@ -942,14 +950,14 @@ function HistoriqueTab() {
           ))}
         </div>
         {filtered.length !== history.length && (
-          <span className="text-xs text-white/30">{filtered.length} / {history.length} chargés</span>
+          <span className="text-xs text-white/30">{th.loaded(filtered.length, history.length)}</span>
         )}
       </div>
 
       {/* Match rows grouped by date */}
       {grouped.length === 0 ? (
         <div className="rounded-xl border border-dashed border-white/12 bg-white/[0.02] px-8 py-12 text-center">
-          <p className="text-white/40">Aucun résultat pour ce filtre.</p>
+          <p className="text-white/40">{th.no_results}</p>
         </div>
       ) : (
         grouped.map(([date, rows]) => (
@@ -969,7 +977,7 @@ function HistoriqueTab() {
                 const pct = Math.round(dayOk / dayTotal * 100);
                 return (
                   <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${pct >= 60 ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" : pct >= 40 ? "border-amber-500/30 bg-amber-500/10 text-amber-300" : "border-rose-500/30 bg-rose-500/10 text-rose-300"}`}>
-                    {dayOk}/{dayTotal} correct{dayOk > 1 ? "s" : ""}
+                    {th.correct_day(dayOk, dayTotal)}
                   </span>
                 );
               })()}
@@ -986,9 +994,9 @@ function HistoriqueTab() {
                 : "—";
               // Real 1X2 label
               const realResult =
-                r.real_home_goals > r.real_away_goals ? "Victoire dom." :
-                r.real_home_goals < r.real_away_goals ? "Victoire ext." :
-                r.real_home_goals === r.real_away_goals ? "Match nul" : "—";
+                r.real_home_goals > r.real_away_goals ? th.win_home :
+                r.real_home_goals < r.real_away_goals ? th.win_away :
+                r.real_home_goals === r.real_away_goals ? th.draw : "—";
 
               // Composite left indicator
               const bothOk    = ok1x2 && okScore;
