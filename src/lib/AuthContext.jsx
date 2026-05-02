@@ -26,12 +26,43 @@ export function AuthProvider({ children }) {
   }, []);
 
   async function signUp(email, password) {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { emailRedirectTo: window.location.origin },
     });
+    if (!error && data?.user) {
+      // Géolocalisation IP en arrière-plan (sans bloquer l'UX)
+      captureSignupMeta(data.user.id, email).catch(() => {});
+    }
     return error;
+  }
+
+  async function captureSignupMeta(userId, email) {
+    let geo = {};
+    try {
+      const res = await fetch("https://ipapi.co/json/");
+      if (res.ok) {
+        const d = await res.json();
+        geo = { signup_ip: d.ip, country: d.country_name, city: d.city };
+      }
+    } catch (_) {}
+
+    // Sauvegarder dans profiles
+    await supabase.from("profiles").upsert({
+      user_id: userId,
+      signup_at: new Date().toISOString(),
+      ...geo,
+    }, { onConflict: "user_id" });
+
+    // Notifier le backend Railway
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL}/notify/new-user`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, ...geo }),
+      });
+    } catch (_) {}
   }
 
   async function signIn(email, password) {
