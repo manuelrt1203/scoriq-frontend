@@ -637,6 +637,99 @@ function ConfidenceCalibration() {
   );
 }
 
+function CompetitionStats() {
+  const [data, setData]       = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/stats/by-competition`)
+      .then(r => r.json())
+      .then(d => { setData(d); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const fmt = v => v != null ? `${v}%` : "—";
+  const color = v => {
+    if (v == null) return "text-white/40";
+    if (v >= 60)   return "text-emerald-400";
+    if (v >= 50)   return "text-white";
+    return "text-orange-400";
+  };
+
+  const typeLabel = t => ({ LEAGUE: "Ligue", EUROPE: "Europe", DOMESTIC_CUP: "Coupe", INTERNATIONAL: "Intl" }[t] ?? t);
+  const typeBadge = t => ({
+    LEAGUE:        "bg-blue-500/15 text-blue-300",
+    EUROPE:        "bg-violet-500/15 text-violet-300",
+    DOMESTIC_CUP:  "bg-orange-500/15 text-orange-300",
+    INTERNATIONAL: "bg-emerald-500/15 text-emerald-300",
+  }[t] ?? "bg-white/10 text-white/50");
+
+  return (
+    <div className="rounded-xl border border-white/8 bg-[#111e2b] overflow-hidden">
+      <div className="px-5 py-4 border-b border-white/8">
+        <p className="text-sm font-semibold text-white/80">Performance par compétition</p>
+        <p className="text-xs text-white/35 mt-0.5">Accuracy sur les prédictions évaluées</p>
+      </div>
+
+      {loading ? (
+        <div className="px-5 py-8 text-center text-white/30 text-sm">Chargement…</div>
+      ) : data.length === 0 ? (
+        <div className="px-5 py-8 text-center text-white/30 text-sm">Aucune donnée</div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-white/8 text-[10px] uppercase tracking-widest text-white/30">
+                <th className="px-5 py-3 text-left">Compétition</th>
+                <th className="px-3 py-3 text-center">Éval.</th>
+                <th className="px-3 py-3 text-center">1X2</th>
+                <th className="px-3 py-3 text-center">BTTS</th>
+                <th className="px-3 py-3 text-center">O2.5</th>
+                <th className="px-3 py-3 text-center">FORTE</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((row, i) => (
+                <tr
+                  key={row.competition_name}
+                  className={`border-b border-white/5 transition-colors hover:bg-white/[0.03] ${i % 2 === 0 ? "" : "bg-white/[0.02]"}`}
+                >
+                  <td className="px-5 py-3">
+                    <div className="flex items-center gap-2">
+                      <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${typeBadge(row.competition_type)}`}>
+                        {typeLabel(row.competition_type)}
+                      </span>
+                      <span className="text-white/80 truncate max-w-[140px]">{row.competition_name}</span>
+                    </div>
+                  </td>
+                  <td className="px-3 py-3 text-center text-white/40 tabular-nums">{row.evaluated}</td>
+                  <td className={`px-3 py-3 text-center font-bold tabular-nums ${color(row.accuracy_1x2)}`}>
+                    {fmt(row.accuracy_1x2)}
+                  </td>
+                  <td className={`px-3 py-3 text-center tabular-nums ${color(row.accuracy_btts)}`}>
+                    {fmt(row.accuracy_btts)}
+                  </td>
+                  <td className={`px-3 py-3 text-center tabular-nums ${color(row.accuracy_over_2_5)}`}>
+                    {fmt(row.accuracy_over_2_5)}
+                  </td>
+                  <td className="px-3 py-3 text-center tabular-nums">
+                    {row.forte_total > 0 ? (
+                      <span className={`font-semibold ${color(row.forte_accuracy)}`}>
+                        {fmt(row.forte_accuracy)}
+                        <span className="text-[10px] text-white/30 ml-1">({row.forte_total})</span>
+                      </span>
+                    ) : <span className="text-white/20">—</span>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function StatsTab({ summary, loading }) {
   const rows = [
     { label: "Prédictions enregistrées", value: summary?.total_predictions ?? "—",           note: "Volume total en base" },
@@ -672,6 +765,7 @@ function StatsTab({ summary, loading }) {
         ))}
       </div>
       <ConfidenceCalibration />
+      <CompetitionStats />
     </div>
   );
 }
