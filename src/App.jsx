@@ -154,6 +154,18 @@ function StarButton({ active, onClick, size = 14 }) {
 }
 
 /* ============================================================
+   MEDAL (top picks ranking)
+   ============================================================ */
+function Medal({ rank }) {
+  const cls = rank === 0 ? "medal-gold" : rank === 1 ? "medal-silver" : rank === 2 ? "medal-bronze" : "bg-white/10 text-white/50";
+  return (
+    <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-black ${cls}`}>
+      {rank + 1}
+    </div>
+  );
+}
+
+/* ============================================================
    PING BADGE (live)
    ============================================================ */
 function PingBadge({ label = "Live", color = "emerald" }) {
@@ -176,7 +188,7 @@ function LangToggle({ lang, toggleLang }) {
   return (
     <button
       onClick={toggleLang}
-      className="flex items-center gap-px rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs font-bold transition hover:bg-white/[0.08]"
+      className="flex items-center gap-px rounded-xl border border-white/[0.1] bg-white/[0.04] px-2.5 py-1.5 text-xs font-bold transition hover:bg-white/[0.08]"
       title="Changer de langue / Switch language"
     >
       <span className={lang === "fr" ? "accent-text" : "text-white/30"}>FR</span>
@@ -213,10 +225,10 @@ function OddsButton({ label, value, isTop }) {
   const pct = Math.round(Number(value || 0) * 100);
   return (
     <div
-      className={`flex h-[48px] w-[52px] flex-col items-center justify-center gap-0.5 rounded-lg border select-none transition-all duration-150 sm:h-[52px] sm:w-[60px] ${
+      className={`flex h-[48px] w-[52px] flex-col items-center justify-center gap-0.5 rounded-xl border select-none transition-all duration-150 sm:h-[52px] sm:w-[60px] ${
         isTop
-          ? "odds-active accent-border-strong accent-bg-subtle"
-          : "border-white/10 bg-white/[0.05] hover:border-white/20 hover:bg-white/[0.09]"
+          ? "odds-active accent-border-strong accent-bg-subtle glow-accent-sm"
+          : "border-white/[0.08] bg-white/[0.04] hover:border-white/[0.18] hover:bg-white/[0.08]"
       }`}
     >
       <span className={`text-[9px] font-semibold uppercase tracking-wide sm:text-[10px] ${isTop ? "accent-text" : "text-white/35"}`}>
@@ -237,10 +249,15 @@ function MatchRow({ match, onOpen, favTeams = [], onToggleTeam, onBet }) {
   const insufficient = match.status_prediction === "INSUFFICIENT_HISTORY";
   const hasFavTeam   = favTeams.includes(match.home_team) || favTeams.includes(match.away_team);
 
+  const trustBorder = insufficient ? "trust-unknown" :
+    match.trust_level === "FORTE"   ? "trust-forte"   :
+    match.trust_level === "MOYENNE" ? "trust-moyenne" :
+    match.trust_level === "FAIBLE"  ? "trust-faible"  : "trust-unknown";
+
   return (
     <div
       onClick={() => onOpen?.(match)}
-      className="group flex cursor-pointer items-center gap-2 border-b border-white/[0.05] px-3 py-3 transition-colors hover:bg-white/[0.035] last:border-0 sm:gap-3 sm:px-4"
+      className={`group flex cursor-pointer items-center gap-2 border-b border-white/[0.05] pl-3 pr-3 py-3.5 transition-all hover:bg-white/[0.04] last:border-0 sm:gap-3 sm:pr-4 ${trustBorder}`}
     >
       {/* Date — hidden on xs */}
       <div className="hidden w-[52px] shrink-0 text-center sm:block">
@@ -265,7 +282,7 @@ function MatchRow({ match, onOpen, favTeams = [], onToggleTeam, onBet }) {
 
       {/* 1 X 2 buttons */}
       {insufficient ? (
-        <div className="shrink-0 rounded-lg border border-white/8 bg-white/[0.04] px-2 py-1.5 text-[10px] text-white/30">
+        <div className="shrink-0 rounded-xl border border-white/[0.08] bg-white/[0.04] px-2 py-1.5 text-[10px] text-white/30">
           Insuff.
         </div>
       ) : (
@@ -329,14 +346,14 @@ function CompetitionGroup({ name, matches, onOpen, favCompetitions = [], onToggl
   const flag = compFlag(name);
 
   return (
-    <div className="anim-fade-up overflow-hidden rounded-xl border border-white/8 bg-[#111e2b]">
+    <div className="anim-fade-up overflow-hidden rounded-2xl border border-white/[0.07] glass shadow-lg shadow-black/[0.15]">
       {/* Header */}
       <button
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center gap-3 border-b border-white/8 bg-[#0f1926] px-4 py-2.5 text-left transition hover:bg-[#131f2e]"
+        className="comp-header flex w-full items-center gap-3 border-b border-white/[0.06] px-4 py-3 text-left"
       >
-        <span className="text-base leading-none">{flag}</span>
-        <span className="text-sm font-semibold text-white/88">{name}</span>
+        <span className="text-xl leading-none">{flag}</span>
+        <span className="text-sm font-semibold text-white/90">{name}</span>
         <StarButton active={favCompetitions.includes(name)} onClick={() => onToggleComp?.(name)} size={13} />
         <span className="ml-auto mr-2 text-xs text-white/30">
           {matches.length} match{matches.length > 1 ? "s" : ""}
@@ -379,8 +396,8 @@ function CompetitionGroup({ name, matches, onOpen, favCompetitions = [], onToggl
    ============================================================ */
 function SkeletonGroup() {
   return (
-    <div className="overflow-hidden rounded-xl border border-white/8 bg-[#111e2b]">
-      <div className="flex items-center gap-3 border-b border-white/8 bg-[#0f1926] px-4 py-2.5">
+    <div className="overflow-hidden rounded-2xl border border-white/[0.07] glass">
+      <div className="comp-header flex items-center gap-3 border-b border-white/[0.06] px-4 py-3">
         <div className="shimmer h-3 w-24 rounded" />
         <div className="shimmer ml-auto h-2.5 w-12 rounded" />
       </div>
@@ -408,7 +425,7 @@ function SkeletonGroup() {
    ============================================================ */
 function EmptyState({ onRun, predicting }) {
   return (
-    <div className="flex flex-col items-center rounded-xl border border-dashed border-white/12 bg-white/[0.02] px-8 py-16 text-center">
+    <div className="flex flex-col items-center rounded-2xl border border-dashed border-white/[0.1] bg-white/[0.015] px-8 py-20 text-center">
       <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/5">
         <Logo size={34} />
       </div>
@@ -465,7 +482,7 @@ function FavorisTab({ matches, favTeams, favCompetitions, onToggleTeam, onToggle
     return (
       <>
         {showManager && <FavorisManager favTeams={favTeams} favCompetitions={favCompetitions} onToggle={onToggle} onClose={() => setShowManager(false)} />}
-        <div className="rounded-xl border border-dashed border-white/12 bg-white/[0.02] px-8 py-16 text-center">
+        <div className="rounded-2xl border border-dashed border-white/[0.1] bg-white/[0.015] px-8 py-16 text-center">
           <p className="text-2xl mb-3">⭐</p>
           <h3 className="text-lg font-semibold text-white">Aucun favori</h3>
           <p className="mt-2 text-sm text-white/40 max-w-xs mx-auto">
@@ -483,7 +500,7 @@ function FavorisTab({ matches, favTeams, favCompetitions, onToggleTeam, onToggle
     return (
       <>
         {showManager && <FavorisManager favTeams={favTeams} favCompetitions={favCompetitions} onToggle={onToggle} onClose={() => setShowManager(false)} />}
-        <div className="rounded-xl border border-dashed border-white/12 bg-white/[0.02] px-8 py-16 text-center">
+        <div className="rounded-2xl border border-dashed border-white/[0.1] bg-white/[0.015] px-8 py-16 text-center">
           <p className="text-sm text-white/40 mb-4">Aucun match du jour pour tes équipes/compétitions favorites.</p>
           <button onClick={() => setShowManager(true)} className="rounded-lg border border-white/10 px-4 py-2 text-xs text-white/50 transition hover:bg-white/[0.05] hover:text-white/80">
             Gérer mes favoris
@@ -504,7 +521,7 @@ function FavorisTab({ matches, favTeams, favCompetitions, onToggleTeam, onToggle
     <>
       {showManager && <FavorisManager favTeams={favTeams} favCompetitions={favCompetitions} onToggle={onToggle} onClose={() => setShowManager(false)} />}
       <div className="mb-3 flex justify-end">
-        <button onClick={() => setShowManager(true)} className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-white/45 transition hover:bg-white/[0.05] hover:text-white/80">
+        <button onClick={() => setShowManager(true)} className="rounded-xl border border-white/[0.1] px-3 py-1.5 text-xs text-white/50 transition hover:bg-white/[0.06] hover:text-white/80">
           ⭐ Gérer mes favoris
         </button>
       </div>
@@ -523,7 +540,7 @@ function FavorisTab({ matches, favTeams, favCompetitions, onToggleTeam, onToggle
 function TopPicksTab({ topPicks, onOpen }) {
   if (topPicks.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-white/12 bg-white/[0.02] px-8 py-12 text-center">
+      <div className="rounded-2xl border border-dashed border-white/[0.1] bg-white/[0.015] px-8 py-12 text-center">
         <p className="text-white/40">Aucun top pick disponible. Lance les pronostics d'abord.</p>
       </div>
     );
@@ -536,13 +553,13 @@ function TopPicksTab({ topPicks, onOpen }) {
           <div
             key={`${match.id || i}`}
             onClick={() => onOpen?.(match)}
-            className="anim-fade-up flex cursor-pointer items-start justify-between gap-4 rounded-xl border border-white/8 bg-[#111e2b] p-4 transition hover:border-emerald-500/20 hover:bg-[#162130]"
+            className="anim-fade-up relative flex cursor-pointer items-start justify-between gap-4 overflow-hidden rounded-2xl border border-white/[0.08] glass p-5 transition-all hover:border-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/[0.06]"
             style={{ animationDelay: `${i * 60}ms` }}
           >
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="gold-text text-xs font-bold">#{i + 1}</span>
-                <span className="text-[11px] text-white/35">{match.competition_name}</span>
+              <div className="flex items-center gap-2.5 mb-3">
+                <Medal rank={i} />
+                <span className="text-[11px] text-white/45">{match.competition_name}</span>
               </div>
               <div className="flex items-center gap-2 mb-1">
                 <TeamLogo name={match.home_team} logo={match.home_badge} size="h-6 w-6" />
@@ -561,9 +578,9 @@ function TopPicksTab({ topPicks, onOpen }) {
               </div>
             </div>
             <div className="shrink-0 text-right">
-              <p className="text-[10px] text-white/30">Score projeté</p>
-              <p className="mt-1 text-2xl font-bold text-white">{match.most_likely_score || "—"}</p>
-              <p className="text-xs text-white/35">{formatPercent(match.most_likely_score_prob)}</p>
+              <p className="text-[9px] uppercase tracking-widest text-white/30">Score</p>
+              <p className="mt-1 text-3xl font-black text-white tabular-nums">{match.most_likely_score || "—"}</p>
+              <p className="text-xs text-white/40">{formatPercent(match.most_likely_score_prob)}</p>
             </div>
           </div>
         );
@@ -600,7 +617,7 @@ function ConfidenceCalibration() {
     lvl === "FORTE" ? "text-emerald-300" : lvl === "MOYENNE" ? "text-amber-300" : "text-rose-300";
 
   return (
-    <div className="rounded-xl border border-white/8 bg-[#111e2b] p-5">
+    <div className="rounded-2xl border border-white/[0.07] glass p-6">
       <p className="mb-4 text-[10px] uppercase tracking-widest text-white/30">Confiance calibrée — réussite réelle par niveau</p>
       {loading ? (
         <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="shimmer h-10 rounded-lg" />)}</div>
@@ -620,10 +637,10 @@ function ConfidenceCalibration() {
                   {rate != null ? `${rate}%` : "—"}
                 </span>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-white/[0.06]">
+              <div className="h-3 overflow-hidden rounded-full bg-white/[0.06]">
                 <div
                   className={`h-full rounded-full transition-all duration-700 ${barColor(lvl)}`}
-                  style={{ width: rate != null ? `${rate}%` : "0%" }}
+                  style={{ width: rate != null ? `${rate}%` : "0%", boxShadow: rate ? "0 0 10px rgba(255,255,255,0.2)" : "none" }}
                 />
               </div>
               {rate != null && (
@@ -667,7 +684,7 @@ function CompetitionStats() {
   }[t] ?? "bg-white/10 text-white/50");
 
   return (
-    <div className="rounded-xl border border-white/8 bg-[#111e2b] overflow-hidden">
+    <div className="rounded-2xl border border-white/[0.07] glass overflow-hidden">
       <div className="px-5 py-4 border-b border-white/8">
         <p className="text-sm font-semibold text-white/80">{ts.comp_title}</p>
         <p className="text-xs text-white/35 mt-0.5">{ts.comp_sub}</p>
@@ -755,13 +772,13 @@ function StatsTab({ summary, loading }) {
         {rows.map(({ label, value, note, hl }, i) => (
           <div
             key={label}
-            className={`anim-fade-up rounded-xl border p-5 ${
-              hl ? "border-emerald-500/20 bg-emerald-500/8" : "border-white/8 bg-[#111e2b]"
+            className={`anim-fade-up rounded-2xl border p-6 ${
+              hl ? "border-emerald-500/25 bg-emerald-500/[0.07] shadow-lg shadow-emerald-500/[0.06]" : "glass border-white/[0.07]"
             }`}
             style={{ animationDelay: `${i * 50}ms` }}
           >
             <p className="text-[10px] uppercase tracking-widest text-white/35">{label}</p>
-            <p className={`mt-2 text-3xl font-bold tabular-nums ${hl ? "text-emerald-300" : "text-white"}`}>
+            <p className={`mt-2 tabular-nums font-black ${hl ? "text-4xl text-emerald-300 text-glow" : "text-3xl text-white"}`}>
               {loading ? "…" : value}
             </p>
             <p className="mt-1.5 text-xs text-white/35">{note}</p>
@@ -788,7 +805,7 @@ function ButsTab({ summary, loading }) {
         {markets.map(({ label, value, note, color }, i) => (
           <div
             key={label}
-            className="anim-fade-up rounded-xl border border-white/8 bg-[#111e2b] p-5"
+            className="anim-fade-up rounded-2xl border border-white/[0.07] glass p-5"
             style={{ animationDelay: `${i * 70}ms` }}
           >
             <p className="text-[10px] uppercase tracking-widest text-white/35">{label}</p>
@@ -798,7 +815,7 @@ function ButsTab({ summary, loading }) {
         ))}
       </div>
 
-      <div className="rounded-xl border border-white/8 bg-[#111e2b] p-5">
+      <div className="rounded-2xl border border-white/[0.07] glass p-5">
         <p className="text-sm font-semibold text-white/70 mb-4">{ts.buts_visual}</p>
         <div className="space-y-4">
           <ProbBar label="Over 1.5" value={summary?.accuracy_over_1_5} colorClass="bg-gradient-to-r from-sky-400 to-cyan-500" />
@@ -908,9 +925,9 @@ function HistoriqueTab() {
             { label: th.accuracy,   value: stats.total ? `${Math.round(stats.ok/stats.total*100)}%` : "—", sub: th.acc_sub, hl: true },
             { label: th.forte,      value: stats.forteTotal ? `${Math.round(stats.forteOk/stats.forteTotal*100)}%` : "—", sub: `${stats.forteTotal} FORTE`, hl: true },
           ].map(({ label, value, sub, hl }) => (
-            <div key={label} className={`rounded-xl border p-4 ${hl ? "border-emerald-500/20 bg-emerald-500/8" : "border-white/8 bg-[#111e2b]"}`}>
+            <div key={label} className={`rounded-2xl border p-4 ${hl ? "border-emerald-500/25 bg-emerald-500/[0.07] shadow-md shadow-emerald-500/[0.06]" : "glass border-white/[0.07]"}`}>
               <p className="text-[9px] uppercase tracking-widest text-white/30">{label}</p>
-              <p className={`mt-1.5 text-2xl font-bold tabular-nums ${hl ? "text-emerald-300" : "text-white"}`}>{value}</p>
+              <p className={`mt-1.5 tabular-nums font-black ${hl ? "text-3xl text-emerald-300 text-glow" : "text-2xl text-white"}`}>{value}</p>
               <p className="text-[10px] text-white/30">{sub}</p>
             </div>
           ))}
@@ -923,12 +940,12 @@ function HistoriqueTab() {
           value={searchH}
           onChange={(e) => setSearchH(e.target.value)}
           placeholder={th.search_ph}
-          className="h-8 min-w-[180px] flex-1 max-w-xs rounded-lg border border-white/10 bg-white/[0.05] px-3 text-sm text-white placeholder:text-white/22 outline-none focus:border-emerald-500/40"
+          className="h-8 min-w-[180px] flex-1 max-w-xs rounded-xl border border-white/[0.1] bg-white/[0.05] px-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/10"
         />
         <div className="flex gap-1.5">
           {[["ALL", th.filter_all],["CORRECT", th.filter_ok],["WRONG", th.filter_wrong]].map(([v,l]) => (
             <button key={v} onClick={() => setFilterH(v)}
-              className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${filterH===v ? "border-emerald-500/35 bg-emerald-500/12 text-emerald-300" : "border-white/8 bg-white/[0.04] text-white/40 hover:text-white/70"}`}>
+              className={`rounded-xl border px-3 py-1.5 text-xs font-semibold transition ${filterH===v ? "border-emerald-500/35 bg-emerald-500/12 text-emerald-300" : "border-white/[0.08] bg-white/[0.04] text-white/40 hover:text-white/70"}`}>
               {l}
             </button>
           ))}
@@ -936,7 +953,7 @@ function HistoriqueTab() {
         <div className="flex gap-1.5">
           {[["ALL", th.conf_all],["FORTE", th.conf_high],["MOYENNE", th.conf_med],["FAIBLE", th.conf_low]].map(([v,l]) => (
             <button key={v} onClick={() => setFilterTrust(v)}
-              className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${filterTrust===v ? "border-emerald-500/35 bg-emerald-500/12 text-emerald-300" : "border-white/8 bg-white/[0.04] text-white/40 hover:text-white/70"}`}>
+              className={`rounded-xl border px-3 py-1.5 text-xs font-semibold transition ${filterTrust===v ? "border-emerald-500/35 bg-emerald-500/12 text-emerald-300" : "border-white/[0.08] bg-white/[0.04] text-white/40 hover:text-white/70"}`}>
               {l}
             </button>
           ))}
@@ -944,7 +961,7 @@ function HistoriqueTab() {
         <div className="flex gap-1.5">
           {[["ALL", th.period_all],["30d", th.period_30d],["7d", th.period_7d]].map(([v,l]) => (
             <button key={v} onClick={() => setFilterPeriod(v)}
-              className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${filterPeriod===v ? "border-emerald-500/35 bg-emerald-500/12 text-emerald-300" : "border-white/8 bg-white/[0.04] text-white/40 hover:text-white/70"}`}>
+              className={`rounded-xl border px-3 py-1.5 text-xs font-semibold transition ${filterPeriod===v ? "border-emerald-500/35 bg-emerald-500/12 text-emerald-300" : "border-white/[0.08] bg-white/[0.04] text-white/40 hover:text-white/70"}`}>
               {l}
             </button>
           ))}
@@ -956,14 +973,14 @@ function HistoriqueTab() {
 
       {/* Match rows grouped by date */}
       {grouped.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-white/12 bg-white/[0.02] px-8 py-12 text-center">
+        <div className="rounded-2xl border border-dashed border-white/[0.1] bg-white/[0.015] px-8 py-12 text-center">
           <p className="text-white/40">{th.no_results}</p>
         </div>
       ) : (
         grouped.map(([date, rows]) => (
-          <div key={date} className="anim-fade-up overflow-hidden rounded-xl border border-white/8 bg-[#111e2b]">
+          <div key={date} className="anim-fade-up overflow-hidden rounded-2xl border border-white/[0.07] glass">
             {/* Date header */}
-            <div className="flex items-center gap-3 border-b border-white/8 bg-[#0f1926] px-4 py-2.5">
+            <div className="comp-header flex items-center gap-3 border-b border-white/[0.06] px-4 py-2.5">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/30">
                 <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
               </svg>
@@ -1113,10 +1130,10 @@ function FilterBtn({ label, value, current, onClick }) {
   return (
     <button
       onClick={() => onClick(value)}
-      className={`rounded-lg border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition ${
+      className={`rounded-xl border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition ${
         active
           ? "border-emerald-500/35 bg-emerald-500/12 text-emerald-300"
-          : "border-white/8 bg-white/[0.04] text-white/40 hover:border-white/15 hover:bg-white/[0.07] hover:text-white/70"
+          : "border-white/[0.08] bg-white/[0.04] text-white/40 hover:border-white/[0.15] hover:bg-white/[0.07] hover:text-white/70"
       }`}
     >
       {label}
@@ -1254,7 +1271,7 @@ function DashboardPage() {
       {accountOpen && <AccountPage onClose={() => setAccountOpen(false)} profile={profile} onUpdateProfile={updateProfile} onUploadAvatar={uploadAvatar} onDeleteAccount={deleteAccount} />}
 
       {/* ════════════════════ TOP NAV ════════════════════ */}
-      <header className="anim-slide-down flex h-[56px] shrink-0 items-center gap-3 border-b px-4" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)" }}>
+      <header className="anim-slide-down flex h-[60px] shrink-0 items-center gap-3 border-b px-5 backdrop-blur-xl" style={{ backgroundColor: "rgba(9,22,36,0.93)", borderColor: "rgba(255,255,255,0.07)", boxShadow: "0 1px 0 rgba(16,185,129,0.18), 0 4px 24px rgba(0,0,0,0.35)" }}>
 
         {/* Brand */}
         <div className="flex items-center gap-2.5 mr-2 shrink-0">
@@ -1291,7 +1308,7 @@ function DashboardPage() {
           )}
           <button
             onClick={loadDashboard}
-            className="hidden rounded-lg border border-white/10 px-3 py-1.5 text-[12px] text-white/45 transition hover:bg-white/[0.06] hover:text-white/70 md:block"
+            className="hidden rounded-xl border border-white/[0.1] px-3 py-1.5 text-[12px] text-white/45 transition hover:bg-white/[0.06] hover:text-white/70 md:block"
           >
             {t.header.refresh}
           </button>
@@ -1340,12 +1357,12 @@ function DashboardPage() {
       <div className="flex flex-1 overflow-hidden">
 
         {/* ── LEFT SIDEBAR ── */}
-        <aside className="anim-slide-left hidden w-[200px] shrink-0 overflow-y-auto border-r border-white/8 lg:block">
+        <aside className="anim-slide-left hidden w-[200px] shrink-0 overflow-y-auto border-r border-white/[0.07] lg:block">
 
           {/* Sports */}
           <div className="p-3">
             <p className="mb-2 px-2 text-[9px] uppercase tracking-[0.35em] text-white/25">{t.sidebar.sports}</p>
-            <div className="flex items-center gap-2.5 rounded-lg accent-bg-subtle accent-border border px-3 py-2.5">
+            <div className="flex items-center gap-2.5 rounded-xl accent-bg-subtle accent-border border px-3 py-2.5">
               <span className="text-base leading-none">⚽</span>
               <span className="text-sm font-semibold text-white/88">Football</span>
               {matches.length > 0 && (
@@ -1368,7 +1385,7 @@ function DashboardPage() {
               <button
                 key={val}
                 onClick={() => setFilter(val)}
-                className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-left transition ${
+                className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-left transition ${
                   filter === val
                     ? "bg-emerald-500/10 text-white"
                     : "text-white/40 hover:bg-white/[0.04] hover:text-white/65"
@@ -1390,7 +1407,7 @@ function DashboardPage() {
               <p className="mb-2 px-2 text-[9px] uppercase tracking-[0.35em] text-white/25">{t.sidebar.competitions}</p>
               <button
                 onClick={() => setCompFilter(null)}
-                className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-left transition ${
+                className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-left transition ${
                   compFilter === null ? "bg-white/[0.06] text-white" : "text-white/40 hover:bg-white/[0.04] hover:text-white/65"
                 }`}
               >
@@ -1400,7 +1417,7 @@ function DashboardPage() {
                 <button
                   key={c}
                   onClick={() => setCompFilter(compFilter === c ? null : c)}
-                  className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-left transition ${
+                  className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-left transition ${
                     compFilter === c ? "bg-white/[0.06] text-white" : "text-white/40 hover:bg-white/[0.04] hover:text-white/65"
                   }`}
                 >
@@ -1416,12 +1433,12 @@ function DashboardPage() {
         <main className="flex-1 min-w-0 overflow-y-auto xl:mr-[256px]">
 
           {/* Sticky sub-header */}
-          <div className="sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b border-white/8 bg-[#0d1520]/95 px-4 py-2.5 backdrop-blur-sm">
+          <div className="sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b border-white/[0.06] bg-[#0d1520]/90 px-4 py-2.5 backdrop-blur-md">
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t.search.placeholder}
-              className="h-8 min-w-[200px] flex-1 max-w-xs rounded-lg border border-white/10 bg-white/[0.05] px-3 text-sm text-white placeholder:text-white/22 outline-none transition focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/15"
+              className="h-8 min-w-[200px] flex-1 max-w-xs rounded-xl border border-white/[0.1] bg-white/[0.05] px-3 text-sm text-white placeholder:text-white/20 outline-none transition focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/15"
             />
             <div className="flex gap-1.5">
               <FilterBtn label={t.sidebar.all_matches} value="ALL"     current={filter} onClick={setFilter} />
@@ -1438,13 +1455,13 @@ function DashboardPage() {
 
           {/* Error */}
           {error && (
-            <div className="m-4 rounded-lg border border-rose-400/20 bg-rose-500/8 px-4 py-3 text-sm text-rose-200">
+            <div className="m-4 rounded-xl border border-rose-400/20 bg-rose-500/[0.08] px-4 py-3 text-sm text-rose-200">
               <span className="font-semibold">Erreur : </span>{error}
             </div>
           )}
 
           {/* Tab content — extra bottom padding on mobile for the bottom nav */}
-          <div className="p-3 pb-20 sm:p-4 lg:pb-4">
+          <div className="p-3 pb-24 sm:p-4 lg:pb-4">
             {activeTab === "matches" && (
               <MatchesTab
                 groupedMatches={groupedMatches}
@@ -1495,7 +1512,7 @@ function DashboardPage() {
         </main>
 
         {/* ── MOBILE BOTTOM NAV ── */}
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 flex h-14 items-stretch border-t border-white/10" style={{ backgroundColor: "var(--bg-nav)" }}>
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 flex h-16 items-stretch border-t border-white/[0.07] backdrop-blur-xl" style={{ backgroundColor: "rgba(9,22,36,0.92)" }}>
           {getMobileNav(t).map(({ id, label, icon }) => (
             <button
               key={id}
@@ -1521,10 +1538,10 @@ function DashboardPage() {
         </nav>
 
         {/* ── RIGHT PANEL ── */}
-        <aside className="hidden xl:block fixed right-0 top-[56px] bottom-0 w-[256px] overflow-y-auto border-l border-white/8 p-4 z-10 space-y-4" style={{ backgroundColor: "var(--bg-base)" }}>
+        <aside className="hidden xl:block fixed right-0 top-[60px] bottom-0 w-[256px] overflow-y-auto border-l border-white/[0.07] p-4 z-10 space-y-4" style={{ backgroundColor: "rgba(9,22,36,0.7)", backdropFilter: "blur(12px)" }}>
 
           {/* Mini stats */}
-          <div className="rounded-xl border border-white/8 p-4" style={{ backgroundColor: "var(--bg-surface)" }}>
+          <div className="rounded-2xl border border-white/[0.07] glass p-4">
             <p className="mb-3 text-[10px] uppercase tracking-[0.3em] text-white/30">{t.sidebar.performances}</p>
             {[
               ["Accuracy 1X2",    summary ? formatPercent(summary.accuracy_1x2)      : "—"],
@@ -1543,7 +1560,7 @@ function DashboardPage() {
           </div>
 
           {/* Top picks mini */}
-          <div className="rounded-xl border border-white/8 p-4" style={{ backgroundColor: "var(--bg-surface)" }}>
+          <div className="rounded-2xl border border-white/[0.07] glass p-4">
             <p className="mb-3 text-[10px] uppercase tracking-[0.3em] text-white/30">{t.sidebar.top_picks}</p>
             {topPicks.length === 0 ? (
               <p className="text-xs text-white/30">{t.sidebar.no_picks}</p>
@@ -1578,7 +1595,7 @@ function DashboardPage() {
           <button
             onClick={runPredictions}
             disabled={predicting}
-            className="btn-green w-full rounded-xl py-3 text-sm font-semibold text-white"
+            className="btn-green w-full rounded-xl py-3 text-sm font-semibold text-white shadow-xl shadow-emerald-500/20"
           >
             {predicting ? t.header.running : t.header.run_full}
           </button>

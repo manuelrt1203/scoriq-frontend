@@ -162,7 +162,10 @@ html, body, #root {
 
 body {
   min-width: 320px;
-  background: #0d1520;
+  background:
+    radial-gradient(ellipse 75% 50% at 12% 8%, rgba(16,185,129,0.07) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 45% at 85% 88%, rgba(99,102,241,0.05) 0%, transparent 50%),
+    #0d1520;
 }
 
 button, input, select, textarea { font: inherit; }
@@ -277,9 +280,9 @@ img { display: block; max-width: 100%; }
   transition: filter 0.15s, transform 0.15s, box-shadow 0.15s;
 }
 .btn-green:hover:not(:disabled) {
-  filter: brightness(1.12);
+  filter: brightness(1.1);
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(var(--accent-rgb), 0.35);
+  box-shadow: 0 6px 24px rgba(var(--accent-rgb), 0.45), 0 2px 8px rgba(var(--accent-rgb), 0.25);
 }
 .btn-green:active:not(:disabled) {
   transform: translateY(0);
@@ -314,4 +317,96 @@ img { display: block; max-width: 100%; }
 
 .odds-active {
   animation: glowPulse 2.5s ease-in-out infinite;
+}
+
+/* ============================================================
+   GLASSMORPHISM
+   ============================================================ */
+
+.glass {
+  background: rgba(17, 30, 43, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+[data-theme="light"] .glass {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ============================================================
+   GLOW EFFECTS
+   ============================================================ */
+
+.glow-accent-sm {
+  box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.32), 0 0 32px rgba(var(--accent-rgb), 0.1);
+}
+
+.text-glow {
+  text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.55), 0 0 42px rgba(var(--accent-rgb), 0.2);
+}
+
+/* ============================================================
+   TRUST LEVEL BORDERS (left accent on match rows)
+   ============================================================ */
+
+.trust-forte   { border-left: 3px solid rgba(52, 211, 153, 0.75); }
+.trust-moyenne { border-left: 3px solid rgba(251, 191, 36, 0.75); }
+.trust-faible  { border-left: 3px solid rgba(251, 113, 133, 0.65); }
+.trust-unknown { border-left: 3px solid transparent; }
+
+/* ============================================================
+   COMPETITION / DATE GROUP HEADER
+   ============================================================ */
+
+.comp-header {
+  background: linear-gradient(
+    90deg,
+    rgba(var(--accent-rgb), 0.09) 0%,
+    rgba(9, 22, 36, 0.95) 55%
+  );
+  transition: background 0.2s ease;
+}
+.comp-header:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(var(--accent-rgb), 0.14) 0%,
+    rgba(13, 28, 44, 0.95) 55%
+  );
+}
+
+[data-theme="light"] .comp-header {
+  background: linear-gradient(
+    90deg,
+    rgba(var(--accent-rgb), 0.08) 0%,
+    rgba(248, 250, 252, 0.95) 55%
+  );
+}
+[data-theme="light"] .comp-header:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(var(--accent-rgb), 0.12) 0%,
+    rgba(241, 245, 249, 0.95) 55%
+  );
+}
+
+/* ============================================================
+   MEDAL BADGES (top picks ranking)
+   ============================================================ */
+
+.medal-gold {
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+  box-shadow: 0 2px 10px rgba(251, 191, 36, 0.45);
+  color: #fff;
+}
+.medal-silver {
+  background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+  box-shadow: 0 2px 8px rgba(148, 163, 184, 0.3);
+  color: #1e293b;
+}
+.medal-bronze {
+  background: linear-gradient(135deg, #fb923c 0%, #c2410c 100%);
+  box-shadow: 0 2px 8px rgba(251, 146, 60, 0.35);
+  color: #fff;
 }

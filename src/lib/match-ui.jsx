@@ -69,7 +69,7 @@ export function TeamLogo({ name, logo, size = "h-7 w-7" }) {
     );
   }
   return (
-    <div className={`${size} flex items-center justify-center rounded-md bg-[#1e2d3d] text-[11px] font-bold text-white/60`}>
+    <div className={`${size} flex items-center justify-center rounded-lg bg-gradient-to-br from-[#1e2d3d] to-[#162130] text-[10px] font-bold text-white/50 ring-1 ring-white/[0.06]`}>
       {initials(name)}
     </div>
   );
@@ -90,10 +90,10 @@ export function ProbBar({ label, value, colorClass }) {
         <span className="text-white/55">{label}</span>
         <span className="font-semibold text-white tabular-nums">{formatPercent(value)}</span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-white/8">
+      <div className="h-3 overflow-hidden rounded-full bg-white/[0.07]">
         <div
           className={`h-full rounded-full ${colorClass} transition-all duration-[850ms] ease-out`}
-          style={{ width: started ? `${width}%` : "0%" }}
+          style={{ width: started ? `${width}%` : "0%", boxShadow: started ? "0 0 10px rgba(255,255,255,0.2)" : "none" }}
         />
       </div>
     </div>
