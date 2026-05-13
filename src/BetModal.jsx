@@ -1,5 +1,20 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useLang } from "./lib/LanguageContext";
+
+const API = import.meta.env.VITE_API_URL ?? "https://web-production-4b111.up.railway.app";
+
+async function fetchMatchOdds(home, away, date) {
+  if (!home || !away || !date) return [];
+  try {
+    const params = new URLSearchParams({ home, away, date: date.slice(0, 10) });
+    const r = await fetch(`${API}/odds/for-match?${params}`);
+    if (!r.ok) return [];
+    const data = await r.json();
+    return data.bookmakers ?? [];
+  } catch {
+    return [];
+  }
+}
 
 const PICKS = [
   { value: "1",        label: "1 — Victoire dom." },
@@ -111,6 +126,41 @@ function MatchPicker({ allMatches, leg, excluded = [], onSelect }) {
   );
 }
 
+function LegOddsPicker({ leg, onSelectOdds }) {
+  const [bookmakers, setBookmakers] = useState([]);
+  useEffect(() => {
+    fetchMatchOdds(leg.match_home, leg.match_away, leg.match_date).then(setBookmakers);
+  }, [leg.match_home, leg.match_away, leg.match_date]);
+
+  if (!bookmakers.length || !["1","X","2"].includes(leg.pick)) return null;
+
+  return (
+    <div className="grid grid-cols-2 gap-1">
+      {bookmakers.map((bk) => {
+        const o = leg.pick === "1" ? bk.odds_home : leg.pick === "X" ? bk.odds_draw : bk.odds_away;
+        if (!o) return null;
+        const active = parseFloat(leg.odds) === o;
+        return (
+          <button
+            key={bk.bookmaker}
+            type="button"
+            onClick={() => onSelectOdds(String(o))}
+            className={`flex items-center justify-between rounded-md border px-2 py-1.5 text-[10px] transition ${
+              active
+                ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-300"
+                : "border-white/8 bg-white/[0.03] text-white/50 hover:text-white/80 hover:border-white/15"
+            }`}
+          >
+            <span>{bk.label}</span>
+            <span className="font-bold tabular-nums">{o}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+
 export default function BetModal({ match, allMatches = [], onAdd, onClose }) {
   const { t } = useLang();
   const tb = t.bet;
@@ -127,8 +177,22 @@ export default function BetModal({ match, allMatches = [], onAdd, onClose }) {
   const [multiStake, setMultiStake] = useState("");
   const [multiNotes, setMultiNotes] = useState("");
 
-  const [saving, setSaving] = useState(false);
-  const [error,  setError]  = useState("");
+  const [saving,    setSaving]    = useState(false);
+  const [error,     setError]     = useState("");
+  const [bookmakers, setBookmakers] = useState([]);
+
+  // Fetch odds quand le match ou le pick change (mode simple)
+  useEffect(() => {
+    if (mode !== "simple") return;
+    fetchMatchOdds(match.home_team, match.away_team, match.date).then(setBookmakers);
+  }, [match.home_team, match.away_team, match.date, mode]);
+
+  function oddsForPick(bk, p) {
+    if (p === "1") return bk.odds_home;
+    if (p === "X") return bk.odds_draw;
+    if (p === "2") return bk.odds_away;
+    return null;
+  }
 
   const combinedOdds = legs.reduce((acc, l) => {
     const o = parseFloat(l.odds);
@@ -251,6 +315,35 @@ export default function BetModal({ match, allMatches = [], onAdd, onClose }) {
                 </select>
               </div>
 
+              {/* Cotes bookmakers */}
+              {bookmakers.length > 0 && ["1","X","2"].includes(pick) && (
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-white/50">Cotes disponibles</label>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {bookmakers.map((bk) => {
+                      const o = oddsForPick(bk, pick);
+                      if (!o) return null;
+                      const active = parseFloat(odds) === o;
+                      return (
+                        <button
+                          key={bk.bookmaker}
+                          type="button"
+                          onClick={() => setOdds(String(o))}
+                          className={`flex items-center justify-between rounded-lg border px-3 py-2 text-xs transition ${
+                            active
+                              ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-300"
+                              : "border-white/8 bg-white/[0.03] text-white/60 hover:border-white/20 hover:text-white/90"
+                          }`}
+                        >
+                          <span className="font-medium">{bk.label}</span>
+                          <span className={`font-bold tabular-nums ${active ? "text-emerald-300" : "text-white/80"}`}>{o}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-white/50">{tb.odds}</label>
@@ -325,6 +418,7 @@ export default function BetModal({ match, allMatches = [], onAdd, onClose }) {
                         placeholder="Cote"
                         className="rounded-lg border border-white/10 bg-white/[0.05] px-2.5 py-2 text-xs text-white placeholder:text-white/20 outline-none focus:border-emerald-500/40" />
                     </div>
+                    <LegOddsPicker leg={leg} onSelectOdds={(o) => updateLeg(i, "odds", o)} />
 
                     {leg.scoriq_pick && (
                       <p className="text-[10px] text-emerald-400/60">
