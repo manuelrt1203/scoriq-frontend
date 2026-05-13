@@ -132,16 +132,15 @@ function LegOddsPicker({ leg, onSelectOdds }) {
     fetchMatchOdds(leg.match_home, leg.match_away, leg.match_date).then(setBookmakers);
   }, [leg.match_home, leg.match_away, leg.match_date]);
 
-  const SUPPORTED = ["1","X","2","Over 1.5","Over 2.5","BTTS"];
+  const SUPPORTED = ["1","X","2","Over 1.5","Over 2.5"];
   if (!bookmakers.length || !SUPPORTED.includes(leg.pick)) return null;
 
   function oddsForPick(bk) {
-    if (leg.pick === "1")         return bk.odds_home;
-    if (leg.pick === "X")         return bk.odds_draw;
-    if (leg.pick === "2")         return bk.odds_away;
-    if (leg.pick === "Over 1.5")  return bk.odds_over_1_5 ?? null;
-    if (leg.pick === "Over 2.5")  return bk.odds_over_2_5 ?? null;
-    if (leg.pick === "BTTS")      return bk.odds_btts_yes  ?? null;
+    if (leg.pick === "1")        return bk.odds_home;
+    if (leg.pick === "X")        return bk.odds_draw;
+    if (leg.pick === "2")        return bk.odds_away;
+    if (leg.pick === "Over 1.5") return bk.odds_over_1_5 ?? null;
+    if (leg.pick === "Over 2.5") return bk.odds_over_2_5 ?? null;
     return null;
   }
 
@@ -202,9 +201,8 @@ export default function BetModal({ match, allMatches = [], onAdd, onClose }) {
     if (p === "1")         return bk.odds_home;
     if (p === "X")         return bk.odds_draw;
     if (p === "2")         return bk.odds_away;
-    if (p === "Over 1.5")  return bk.odds_over_1_5 ?? null;
-    if (p === "Over 2.5")  return bk.odds_over_2_5 ?? null;
-    if (p === "BTTS")      return bk.odds_btts_yes  ?? null;
+    if (p === "Over 1.5")  return bk.odds_over_1_5  ?? null;
+    if (p === "Over 2.5")  return bk.odds_over_2_5  ?? null;
     return null;
   }
 
@@ -330,7 +328,7 @@ export default function BetModal({ match, allMatches = [], onAdd, onClose }) {
               </div>
 
               {/* Cotes bookmakers */}
-              {bookmakers.length > 0 && ["1","X","2","Over 1.5","Over 2.5","BTTS"].includes(pick) && (
+              {bookmakers.length > 0 && ["1","X","2","Over 1.5","Over 2.5"].includes(pick) && (
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-white/50">Cotes disponibles</label>
                   <div className="grid grid-cols-2 gap-1.5">
