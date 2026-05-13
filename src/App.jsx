@@ -8,9 +8,6 @@ import { useAuth } from "./lib/AuthContext.jsx";
 import { useProfile } from "./lib/useProfile.js";
 import { useFavorites } from "./lib/useFavorites.js";
 import FavorisManager from "./FavorisManager.jsx";
-import BetModal from "./BetModal.jsx";
-import CarnetTab from "./CarnetTab.jsx";
-import { useBets } from "./lib/useBets.js";
 import { useLang } from "./lib/LanguageContext.jsx";
 import {
   formatGoals,
@@ -50,7 +47,6 @@ function getTabs(t) {
   return [
     { id: "matches",    label: t.tabs.matches },
     { id: "favoris",    label: t.tabs.favoris },
-    { id: "carnet",     label: t.tabs.carnet },
     { id: "toppicks",   label: t.tabs.toppicks },
     { id: "historique", label: t.tabs.historique },
     { id: "stats",      label: t.tabs.stats },
@@ -76,15 +72,6 @@ function getMobileNav(t) {
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-        </svg>
-      ),
-    },
-    {
-      id: "carnet",
-      label: t.tabs.carnet,
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M4 6h16M4 10h16M4 14h10" /><rect x="3" y="3" width="18" height="18" rx="2" />
         </svg>
       ),
     },
@@ -312,22 +299,6 @@ function MatchRow({ match, onOpen, favTeams = [], onToggleTeam, onBet }) {
       {/* Confidence badge — hidden on mobile */}
       <div className={`hidden shrink-0 rounded-full border px-2.5 py-[3px] text-[10px] font-bold uppercase tracking-wide md:block ${meta.badge}`}>
         {match.trust_level || "—"}
-      </div>
-
-      {/* Bet button — fixed width, invisible until hover */}
-      <div className="w-16 shrink-0 flex justify-center">
-        {!insufficient && (
-          <button
-            onClick={(e) => { e.stopPropagation(); onBet?.(match); }}
-            className="opacity-0 group-hover:opacity-100 flex items-center gap-1 rounded-lg border border-emerald-500/25 bg-emerald-500/8 px-2 py-1 text-[10px] font-semibold text-emerald-400 transition-all hover:bg-emerald-500/20"
-            title="Enregistrer un pari"
-          >
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            Parier
-          </button>
-        )}
       </div>
 
       {/* Arrow */}
@@ -1148,8 +1119,6 @@ function DashboardPage() {
   const { lang, toggleLang, t }                         = useLang();
   const { user, signOut }                               = useAuth();
   const { favTeams, favCompetitions, isFav, toggle }    = useFavorites();
-  const { bets, loading: betsLoading, addBet, updateResult, deleteBet, autoEvaluate } = useBets();
-  const [betMatch, setBetMatch] = useState(null);
   const [summary,    setSummary]    = useState(null);
   const [matches,    setMatches]    = useState([]);
   const [topPicks,   setTopPicks]   = useState([]);
@@ -1168,13 +1137,6 @@ function DashboardPage() {
 
   const navigate = useNavigate();
   const location = useLocation();
-
-  useEffect(() => {
-    if (location.state?.openBet) {
-      setBetMatch(location.state.openBet);
-      window.history.replaceState({}, "");
-    }
-  }, [location.state]);
 
   function openMatch(match) {
     const encoded = encodeURIComponent(`${match.home_team}__${match.away_team}__${match.date || ""}`);
@@ -1267,7 +1229,6 @@ function DashboardPage() {
   /* ── RENDER ── */
   return (
     <div className="flex flex-col" style={{ height: "100dvh", overflow: "hidden", backgroundColor: "var(--bg-base)", color: "var(--text-primary)" }}>
-      {betMatch && <BetModal match={betMatch} allMatches={matches} onAdd={addBet} onClose={() => setBetMatch(null)} />}
       {accountOpen && <AccountPage onClose={() => setAccountOpen(false)} profile={profile} onUpdateProfile={updateProfile} onUploadAvatar={uploadAvatar} onDeleteAccount={deleteAccount} />}
 
       {/* ════════════════════ TOP NAV ════════════════════ */}
@@ -1473,7 +1434,6 @@ function DashboardPage() {
                 favCompetitions={favCompetitions}
                 onToggleTeam={(name) => toggle("team", name)}
                 onToggleComp={(name) => toggle("competition", name)}
-                onBet={setBetMatch}
               />
             )}
             {activeTab === "favoris" && (
@@ -1485,15 +1445,6 @@ function DashboardPage() {
                 onToggleComp={(name) => toggle("competition", name)}
                 onToggle={toggle}
                 onOpen={openMatch}
-              />
-            )}
-            {activeTab === "carnet" && (
-              <CarnetTab
-                bets={bets}
-                loading={betsLoading}
-                onUpdateResult={updateResult}
-                onDelete={deleteBet}
-                onAutoEvaluate={autoEvaluate}
               />
             )}
             {activeTab === "toppicks" && (

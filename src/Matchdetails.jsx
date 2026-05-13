@@ -255,12 +255,6 @@ export default function MatchDetail() {
         </div>
 
         <div className="ml-auto flex items-center gap-2">
-          <button
-            onClick={() => navigate("/", { state: { openBet: match } })}
-            className="btn-green rounded-lg px-3 py-1.5 text-xs font-semibold text-white"
-          >
-            Parier
-          </button>
           <span className={`rounded-full border px-2 py-1 text-[10px] font-bold uppercase tracking-wide ${meta.badge}`}>
             {insufficient ? "Insuff." : match.trust_level || "—"}
           </span>
