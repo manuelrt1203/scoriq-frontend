@@ -13,7 +13,7 @@ export function useFavorites() {
       .select("*")
       .eq("user_id", user.id)
       .then(({ data }) => setFavorites(data || []));
-  }, [user]);
+  }, [user?.id]);
 
   function isFav(type, name) {
     return favorites.some((f) => f.type === type && f.name === name);

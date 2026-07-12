@@ -18,7 +18,9 @@ export function AuthProvider({ children }) {
       if (event === "PASSWORD_RECOVERY") {
         setPasswordRecovery(true);
       } else {
-        setUser(session?.user ?? null);
+        // Ne pas recréer la référence user sur un simple TOKEN_REFRESHED :
+        // ça casse les useEffect([user?.id]) et redéclenche des boucles de fetch.
+        setUser((prev) => (prev?.id === (session?.user?.id ?? null) ? prev : session?.user ?? null));
       }
     });
 
