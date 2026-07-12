@@ -12,7 +12,7 @@ import {
 const BRAND  = "ScorIQ";
 const SLOGAN = "L'IA qui voit les matchs autrement";
 
-const API_BASE = "https://web-production-4b111.up.railway.app";
+const API_BASE = "https://scoriq-backend.onrender.com";
 
 /* ─── Tête-à-tête ──────────────────────────────────────── */
 function H2HSection({ homeTeam, awayTeam }) {

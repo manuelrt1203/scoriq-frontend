@@ -37,7 +37,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,woff2}'],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/web-production-4b111\.up\.railway\.app\/.*/i,
+            urlPattern: /^https:\/\/scoriq-backend\.onrender\.com\/.*/i,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'scoriq-api',

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const API_BASE = "https://web-production-4b111.up.railway.app";
+const API_BASE = "https://scoriq-backend.onrender.com";
 
 export default function FavorisManager({ favTeams, favCompetitions, onToggle, onClose }) {
   const [tab, setTab]           = useState("teams"); // "teams" | "competitions"

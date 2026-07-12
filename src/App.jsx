@@ -18,7 +18,7 @@ import {
   ProbBar,
 } from "./lib/match-ui.jsx";
 
-const API_BASE = "https://web-production-4b111.up.railway.app";
+const API_BASE = "https://scoriq-backend.onrender.com";
 const BRAND   = "ScorIQ";
 const SLOGAN  = "L'IA qui voit les matchs autrement";
 
