@@ -7,6 +7,7 @@ import {
   trustMeta,
   TeamLogo,
   ProbBar,
+  Spinner,
 } from "./lib/match-ui.jsx";
 
 const BRAND  = "ScorIQ";
@@ -33,7 +34,9 @@ function H2HSection({ homeTeam, awayTeam }) {
     <div className="rounded-xl border border-white/8 bg-[#111e2b] p-5">
       <p className="text-[9px] uppercase tracking-[0.3em] text-white/30 mb-4">Tête-à-tête récent</p>
       {loading ? (
-        <p className="text-sm text-white/30 animate-pulse">Chargement…</p>
+        <div className="flex items-center gap-2 text-sm text-white/30">
+          <Spinner size="xs" /> Chargement…
+        </div>
       ) : !matches.length ? (
         <p className="text-sm text-white/30">Aucune confrontation trouvée.</p>
       ) : (
@@ -89,7 +92,9 @@ function StandingsSection({ competitionName, homeTeam, awayTeam }) {
   if (loading) return (
     <div className="rounded-xl border border-white/8 bg-[#111e2b] p-5">
       <p className="text-[9px] uppercase tracking-[0.3em] text-white/30 mb-4">Classement</p>
-      <p className="text-sm text-white/30 animate-pulse">Chargement…</p>
+      <div className="flex items-center gap-2 text-sm text-white/30">
+        <Spinner size="xs" /> Chargement…
+      </div>
     </div>
   );
 

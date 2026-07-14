@@ -272,6 +272,31 @@ img { display: block; max-width: 100%; }
 }
 
 /* ============================================================
+   LOADER (branded dual-ring, remplace le spinner générique)
+   ============================================================ */
+
+@keyframes spinRing {
+  to { transform: rotate(360deg); }
+}
+
+.spinner-ring {
+  display: inline-block;
+  border-radius: 9999px;
+  border: 2px solid rgba(var(--accent-rgb), 0.18);
+  border-top-color: var(--accent-light);
+  border-right-color: var(--accent-light);
+  animation: spinRing 0.7s linear infinite;
+  filter: drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.35));
+}
+
+.spinner-ring-light {
+  border-color: rgba(255, 255, 255, 0.25);
+  border-top-color: #fff;
+  border-right-color: #fff;
+  filter: none;
+}
+
+/* ============================================================
    GREEN BUTTON
    ============================================================ */
 

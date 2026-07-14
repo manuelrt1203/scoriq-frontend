@@ -55,6 +55,20 @@ function initials(name) {
     .join("");
 }
 
+const SPINNER_SIZES = { xs: 12, sm: 16, md: 24, lg: 36 };
+
+export function Spinner({ size = "sm", tone = "accent", className = "" }) {
+  const px = SPINNER_SIZES[size] || SPINNER_SIZES.sm;
+  return (
+    <span
+      className={`spinner-ring ${tone === "light" ? "spinner-ring-light" : ""} ${className}`}
+      style={{ width: px, height: px }}
+      role="status"
+      aria-label="Chargement"
+    />
+  );
+}
+
 export function TeamLogo({ name, logo, size = "h-7 w-7" }) {
   const [failed, setFailed] = useState(false);
 

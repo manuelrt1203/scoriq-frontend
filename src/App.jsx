@@ -16,6 +16,7 @@ import {
   trustMeta,
   TeamLogo,
   ProbBar,
+  Spinner,
 } from "./lib/match-ui.jsx";
 
 const API_BASE = "https://scoriq-backend.onrender.com";
@@ -407,8 +408,9 @@ function EmptyState({ onRun, predicting }) {
       <button
         onClick={onRun}
         disabled={predicting}
-        className="btn-green mt-6 rounded-lg px-6 py-2.5 text-sm font-semibold text-white"
+        className="btn-green mt-6 flex items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-semibold text-white"
       >
+        {predicting && <Spinner size="xs" tone="light" />}
         {predicting ? "Calcul en cours…" : "Lancer les pronostics"}
       </button>
     </div>
@@ -1083,8 +1085,9 @@ function HistoriqueTab() {
           <button
             onClick={() => fetchPage(offset)}
             disabled={loadingMore}
-            className="rounded-lg border border-white/10 bg-white/[0.04] px-5 py-2 text-xs font-semibold text-white/50 transition hover:bg-white/[0.08] hover:text-white/80 disabled:opacity-40"
+            className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-5 py-2 text-xs font-semibold text-white/50 transition hover:bg-white/[0.08] hover:text-white/80 disabled:opacity-40"
           >
+            {loadingMore && <Spinner size="xs" />}
             {loadingMore ? "Chargement…" : `Charger plus (${HIST_PAGE} suivants)`}
           </button>
         </div>
@@ -1277,9 +1280,10 @@ function DashboardPage() {
           <button
             onClick={runPredictions}
             disabled={predicting}
-            className="btn-green rounded-lg px-3 py-1.5 text-sm font-semibold text-white sm:px-4 sm:py-2"
+            className="btn-green flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-white sm:px-4 sm:py-2"
           >
-            <span className="sm:hidden">{predicting ? "…" : t.header.run}</span>
+            {predicting && <Spinner size="xs" tone="light" />}
+            <span className="sm:hidden">{predicting ? "" : t.header.run}</span>
             <span className="hidden sm:inline">{predicting ? t.header.running : t.header.run_full}</span>
           </button>
           <UserMenu user={user} profile={profile} onOpenAccount={() => setAccountOpen(true)} />
@@ -1546,8 +1550,9 @@ function DashboardPage() {
           <button
             onClick={runPredictions}
             disabled={predicting}
-            className="btn-green w-full rounded-xl py-3 text-sm font-semibold text-white shadow-xl shadow-emerald-500/20"
+            className="btn-green flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white shadow-xl shadow-emerald-500/20"
           >
+            {predicting && <Spinner size="xs" tone="light" />}
             {predicting ? t.header.running : t.header.run_full}
           </button>
 
@@ -1575,7 +1580,7 @@ export default function App() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center bg-[#0d1520]">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/10 border-t-emerald-400" />
+        <Spinner size="lg" />
       </div>
     );
   }

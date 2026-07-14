@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "./lib/AuthContext";
 import { useLang } from "./lib/LanguageContext";
+import { Spinner } from "./lib/match-ui";
 
 function Logo({ size = 32 }) {
   return (
@@ -107,7 +108,8 @@ export default function AuthPage() {
               </div>
               {error   && <p className="rounded-lg border border-rose-400/20 bg-rose-500/8 px-3 py-2 text-xs text-rose-300">{error}</p>}
               {success && <p className="rounded-lg border border-emerald-400/20 bg-emerald-500/8 px-3 py-2 text-xs text-emerald-300">{success}</p>}
-              <button type="submit" disabled={loading} className="btn-green w-full rounded-lg py-2.5 text-sm font-semibold text-white">
+              <button type="submit" disabled={loading} className="btn-green flex w-full items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold text-white">
+                {loading && <Spinner size="xs" tone="light" />}
                 {loading ? ta.loading : ta.update_password}
               </button>
             </form>
@@ -130,7 +132,8 @@ export default function AuthPage() {
               </div>
               {error   && <p className="rounded-lg border border-rose-400/20 bg-rose-500/8 px-3 py-2 text-xs text-rose-300">{error}</p>}
               {success && <p className="rounded-lg border border-emerald-400/20 bg-emerald-500/8 px-3 py-2 text-xs text-emerald-300">{success}</p>}
-              <button type="submit" disabled={loading} className="btn-green w-full rounded-lg py-2.5 text-sm font-semibold text-white">
+              <button type="submit" disabled={loading} className="btn-green flex w-full items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold text-white">
+                {loading && <Spinner size="xs" tone="light" />}
                 {loading ? ta.loading : ta.send_link}
               </button>
               <button type="button" onClick={() => reset("login")} className="w-full text-center text-xs text-white/35 hover:text-white/60 transition pt-1">
@@ -183,7 +186,8 @@ export default function AuthPage() {
               {error   && <p className="rounded-lg border border-rose-400/20 bg-rose-500/8 px-3 py-2 text-xs text-rose-300">{error}</p>}
               {success && <p className="rounded-lg border border-emerald-400/20 bg-emerald-500/8 px-3 py-2 text-xs text-emerald-300">{success}</p>}
 
-              <button type="submit" disabled={loading} className="btn-green w-full rounded-lg py-2.5 text-sm font-semibold text-white">
+              <button type="submit" disabled={loading} className="btn-green flex w-full items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold text-white">
+                {loading && <Spinner size="xs" tone="light" />}
                 {loading ? ta.loading : mode === "login" ? ta.sign_in : ta.create_account}
               </button>
             </form>

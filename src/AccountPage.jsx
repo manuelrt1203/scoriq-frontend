@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "./lib/AuthContext";
 import { useTheme, ACCENT_OPTIONS } from "./lib/ThemeContext";
+import { Spinner } from "./lib/match-ui";
 
 /* ── Section wrapper ── */
 function Section({ title, children }) {
@@ -54,7 +55,7 @@ function AvatarBlock({ profile, user, onUpload, uploading }) {
           title="Changer l'avatar"
         >
           {uploading
-            ? <span className="h-3 w-3 animate-spin rounded-full border-2 border-white/20 border-t-white/80" />
+            ? <Spinner size="xs" />
             : <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           }
         </button>
@@ -168,7 +169,7 @@ export default function AccountPage({ onClose, profile, onUpdateProfile, onUploa
 
         {loading ? (
           <div className="flex flex-1 items-center justify-center">
-            <span className="h-6 w-6 animate-spin rounded-full border-2 border-white/10 border-t-white/60" />
+            <Spinner size="md" />
           </div>
         ) : (
           <>
@@ -197,10 +198,10 @@ export default function AccountPage({ onClose, profile, onUpdateProfile, onUploa
                     <button
                       onClick={handleSaveProfile}
                       disabled={saving}
-                      className="rounded-lg px-4 py-2 text-sm font-semibold text-white transition"
+                      className="flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition"
                       style={{ backgroundColor: saveOk ? "#22c55e" : "var(--accent)" }}
                     >
-                      {saveOk ? "✓" : saving ? "…" : "Sauvegarder"}
+                      {saveOk ? "✓" : saving ? <Spinner size="xs" tone="light" /> : "Sauvegarder"}
                     </button>
                   </div>
                 </div>
@@ -248,10 +249,10 @@ export default function AccountPage({ onClose, profile, onUpdateProfile, onUploa
                       <button
                         onClick={handleChangePassword}
                         disabled={pwSaving}
-                        className="rounded-lg px-4 py-2 text-sm font-semibold text-white transition"
+                        className="flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition"
                         style={{ backgroundColor: "var(--accent)" }}
                       >
-                        {pwSaving ? "…" : "Modifier"}
+                        {pwSaving ? <Spinner size="xs" tone="light" /> : "Modifier"}
                       </button>
                     </div>
                   )}
