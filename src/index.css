@@ -361,6 +361,36 @@ img { display: block; max-width: 100%; }
 }
 
 /* ============================================================
+   CARD SYSTEM — référence unique pour toutes les cartes du site
+   (remplace les variantes dupliquées : rounded-xl/2xl, border-white/8
+   vs [0.07] vs [0.08], fonds opaques codés en dur bg-[#111e2b]…)
+   ============================================================ */
+
+.card {
+  border-radius: 1rem; /* rounded-2xl */
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(17, 30, 43, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+[data-theme="light"] .card {
+  border-color: rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.card-tight { padding: 1rem; }    /* p-4 — listes denses (dashboard) */
+.card-loose { padding: 1.25rem; } /* p-5 — sections aérées (détail, réglages) */
+
+.label-eyebrow {
+  font-size: 9px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--text-muted);
+}
+
+/* ============================================================
    GLOW EFFECTS
    ============================================================ */
 

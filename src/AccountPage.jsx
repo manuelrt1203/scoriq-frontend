@@ -372,7 +372,7 @@ export default function AccountPage({ onClose, profile, onUpdateProfile, onUploa
               )}
 
               {deleteStep === 1 && (
-                <div className="rounded-xl border border-rose-500/30 bg-rose-500/8 p-4 anim-fade-in">
+                <div className="card-tight rounded-2xl border border-rose-500/30 bg-rose-500/8 anim-fade-in">
                   <p className="mb-1 font-semibold text-rose-300">Tu es sûr ?</p>
                   <p className="mb-4 text-xs text-rose-400/70">
                     Toutes tes données (favoris, carnet de paris, profil) seront supprimées définitivement.

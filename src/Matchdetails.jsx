@@ -31,8 +31,8 @@ function H2HSection({ homeTeam, awayTeam }) {
   }, [homeTeam, awayTeam]);
 
   return (
-    <div className="rounded-xl border border-white/8 bg-[#111e2b] p-5">
-      <p className="text-[9px] uppercase tracking-[0.3em] text-white/30 mb-4">Tête-à-tête récent</p>
+    <div className="card card-loose">
+      <p className="label-eyebrow mb-4">Tête-à-tête récent</p>
       {loading ? (
         <div className="flex items-center gap-2 text-sm text-white/30">
           <Spinner size="xs" /> Chargement…
@@ -90,8 +90,8 @@ function StandingsSection({ competitionName, homeTeam, awayTeam }) {
   }, [competitionName]);
 
   if (loading) return (
-    <div className="rounded-xl border border-white/8 bg-[#111e2b] p-5">
-      <p className="text-[9px] uppercase tracking-[0.3em] text-white/30 mb-4">Classement</p>
+    <div className="card card-loose">
+      <p className="label-eyebrow mb-4">Classement</p>
       <div className="flex items-center gap-2 text-sm text-white/30">
         <Spinner size="xs" /> Chargement…
       </div>
@@ -99,8 +99,8 @@ function StandingsSection({ competitionName, homeTeam, awayTeam }) {
   );
 
   if (!table.length) return (
-    <div className="rounded-xl border border-white/8 bg-[#111e2b] p-5">
-      <p className="text-[9px] uppercase tracking-[0.3em] text-white/30 mb-4">Classement</p>
+    <div className="card card-loose">
+      <p className="label-eyebrow mb-4">Classement</p>
       <p className="text-sm text-white/30">Classement non disponible pour cette compétition.</p>
     </div>
   );
@@ -109,14 +109,14 @@ function StandingsSection({ competitionName, homeTeam, awayTeam }) {
   const at = awayTeam.toLowerCase();
 
   return (
-    <div className="rounded-xl border border-white/8 bg-[#111e2b] p-5">
-      <p className="text-[9px] uppercase tracking-[0.3em] text-white/30 mb-4">
+    <div className="card card-loose">
+      <p className="label-eyebrow mb-4">
         Classement — {competitionName}
       </p>
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
-            <tr className="border-b border-white/8 text-[9px] uppercase tracking-wider text-white/25">
+            <tr className="border-b border-white/[0.07] text-[9px] uppercase tracking-wider text-white/25">
               <th className="pb-2 text-center w-6">#</th>
               <th className="pb-2 text-left pl-1">Équipe</th>
               <th className="pb-2 text-center w-8">J</th>
@@ -171,14 +171,14 @@ function Logo({ size = 26 }) {
 function MetricCard({ label, value, note, delay = 0, accent = false }) {
   return (
     <div
-      className={`anim-fade-up rounded-xl border p-4 ${
+      className={`anim-fade-up card-tight ${
         accent
-          ? "border-emerald-500/20 bg-emerald-500/8"
-          : "border-white/8 bg-[#111e2b]"
+          ? "rounded-2xl border border-emerald-500/20 bg-emerald-500/8"
+          : "card"
       }`}
       style={{ animationDelay: `${delay}ms` }}
     >
-      <p className="text-[9px] uppercase tracking-[0.3em] text-white/30">{label}</p>
+      <p className="label-eyebrow">{label}</p>
       <p className={`mt-2 text-2xl font-bold tabular-nums ${accent ? "text-emerald-300" : "text-white"}`}>
         {value}
       </p>
@@ -211,9 +211,9 @@ export default function MatchDetail() {
 
   if (!match) {
     return (
-      <div className="flex h-screen flex-col bg-[#0d1520] text-white">
+      <div className="flex h-screen flex-col bg-[var(--bg-base)] text-white">
         {/* Nav bar */}
-        <header className="flex h-[52px] items-center gap-3 border-b border-white/8 bg-[#091624] px-4">
+        <header className="flex h-[52px] items-center gap-3 border-b border-white/[0.07] bg-[var(--bg-nav)] px-4">
           <Logo size={26} />
           <span className="brand-text text-lg font-bold">{BRAND}</span>
         </header>
@@ -240,10 +240,10 @@ export default function MatchDetail() {
   const insufficient = match.status_prediction === "INSUFFICIENT_HISTORY";
 
   return (
-    <div className="flex h-screen flex-col bg-[#0d1520] text-white overflow-hidden">
+    <div className="flex h-screen flex-col bg-[var(--bg-base)] text-white overflow-hidden">
 
       {/* ── TOP NAV ── */}
-      <header className="anim-slide-down flex h-[52px] shrink-0 items-center gap-3 border-b border-white/8 bg-[#091624] px-4">
+      <header className="anim-slide-down flex h-[52px] shrink-0 items-center gap-3 border-b border-white/[0.07] bg-[var(--bg-nav)] px-4">
         <button
           onClick={() => navigate("/")}
           className="flex items-center gap-2 rounded-lg border border-white/10 px-3 py-1.5 text-sm text-white/60 transition hover:bg-white/[0.06] hover:text-white/90"
@@ -271,7 +271,7 @@ export default function MatchDetail() {
         <div className="mx-auto max-w-6xl space-y-5 p-4 md:p-6">
 
           {/* Match hero card */}
-          <div className="anim-fade-up relative overflow-hidden rounded-xl border border-white/8 bg-[#111e2b] p-6">
+          <div className="anim-fade-up relative overflow-hidden card p-6">
             {/* Background glow */}
             <div className="pointer-events-none absolute inset-0">
               <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-emerald-500/8 blur-3xl" />
@@ -360,7 +360,7 @@ export default function MatchDetail() {
           {/* Probability + Goals charts */}
           {!insufficient && (
             <div className="anim-fade-up grid gap-4 xl:grid-cols-2" style={{ animationDelay: "150ms" }}>
-              <div className="rounded-xl border border-white/8 bg-[#111e2b] p-5">
+              <div className="card card-loose">
                 <h2 className="text-sm font-semibold text-white/80">Répartition 1X2</h2>
                 <p className="mt-1 text-xs text-white/35 mb-5">
                   Les trois scénarios pondérés par le modèle.
@@ -372,7 +372,7 @@ export default function MatchDetail() {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-white/8 bg-[#111e2b] p-5">
+              <div className="card card-loose">
                 <h2 className="text-sm font-semibold text-white/80">Marchés buts</h2>
                 <p className="mt-1 text-xs text-white/35 mb-5">{goalNote(match)}</p>
                 <div className="space-y-4">
@@ -389,8 +389,8 @@ export default function MatchDetail() {
             <div className="anim-fade-up grid gap-4 xl:grid-cols-[1fr_1fr_1fr]" style={{ animationDelay: "220ms" }}>
 
               {/* Top 3 scores */}
-              <div className="rounded-xl border border-white/8 bg-[#111e2b] p-5">
-                <p className="text-[9px] uppercase tracking-[0.3em] text-white/30 mb-4">Top 3 scores les plus probables</p>
+              <div className="card card-loose">
+                <p className="label-eyebrow mb-4">Top 3 scores les plus probables</p>
                 <div className="space-y-2.5">
                   {(match.top3_scores || []).map(({ score, prob }, i) => {
                     const isForPick = score === match.most_likely_score_for_pick;
@@ -423,8 +423,8 @@ export default function MatchDetail() {
               </div>
 
               {/* Cohérence score vs prédiction */}
-              <div className={`rounded-xl border p-5 ${match.score_coherent === false ? "border-amber-400/20 bg-amber-400/5" : "border-emerald-500/15 bg-emerald-500/5"}`}>
-                <p className="text-[9px] uppercase tracking-[0.3em] text-white/30 mb-3">Cohérence score / résultat</p>
+              <div className={`card-loose rounded-2xl border ${match.score_coherent === false ? "border-amber-400/20 bg-amber-400/5" : "border-emerald-500/15 bg-emerald-500/5"}`}>
+                <p className="label-eyebrow mb-3">Cohérence score / résultat</p>
                 {match.score_coherent === false ? (
                   <>
                     <div className="flex items-center gap-2 mb-3">
@@ -459,8 +459,8 @@ export default function MatchDetail() {
               </div>
 
               {/* Confiance & risque */}
-              <div className="rounded-xl border border-white/8 bg-[#111e2b] p-5">
-                <p className="text-[9px] uppercase tracking-[0.3em] text-white/30 mb-3">Confiance & risque</p>
+              <div className="card card-loose">
+                <p className="label-eyebrow mb-3">Confiance & risque</p>
                 <div className="space-y-3">
                   <div>
                     <p className="text-[10px] text-white/30">Niveau de confiance</p>

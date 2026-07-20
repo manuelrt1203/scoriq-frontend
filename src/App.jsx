@@ -322,7 +322,7 @@ function CompetitionGroup({ name, matches, onOpen, favCompetitions = [], onToggl
   const flag = compFlag(name);
 
   return (
-    <div className="anim-fade-up overflow-hidden rounded-2xl border border-white/[0.07] glass shadow-lg shadow-black/[0.15]">
+    <div className="anim-fade-up overflow-hidden card shadow-lg shadow-black/[0.15]">
       {/* Header */}
       <button
         onClick={() => setOpen(!open)}
@@ -372,7 +372,7 @@ function CompetitionGroup({ name, matches, onOpen, favCompetitions = [], onToggl
    ============================================================ */
 function SkeletonGroup() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/[0.07] glass">
+    <div className="overflow-hidden card">
       <div className="comp-header flex items-center gap-3 border-b border-white/[0.06] px-4 py-3">
         <div className="shimmer h-3 w-24 rounded" />
         <div className="shimmer ml-auto h-2.5 w-12 rounded" />
@@ -530,7 +530,7 @@ function TopPicksTab({ topPicks, onOpen }) {
           <div
             key={`${match.id || i}`}
             onClick={() => onOpen?.(match)}
-            className="anim-fade-up relative flex cursor-pointer items-start justify-between gap-4 overflow-hidden rounded-2xl border border-white/[0.08] glass p-5 transition-all hover:border-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/[0.06]"
+            className="anim-fade-up relative flex cursor-pointer items-start justify-between gap-4 overflow-hidden card card-loose transition-all hover:border-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/[0.06]"
             style={{ animationDelay: `${i * 60}ms` }}
           >
             <div className="min-w-0 flex-1">
@@ -594,7 +594,7 @@ function ConfidenceCalibration() {
     lvl === "FORTE" ? "text-emerald-300" : lvl === "MOYENNE" ? "text-amber-300" : "text-rose-300";
 
   return (
-    <div className="rounded-2xl border border-white/[0.07] glass p-6">
+    <div className="card p-6">
       <p className="mb-4 text-[10px] uppercase tracking-widest text-white/30">Confiance calibrée — réussite réelle par niveau</p>
       {loading ? (
         <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="shimmer h-10 rounded-lg" />)}</div>
@@ -661,8 +661,8 @@ function CompetitionStats() {
   }[t] ?? "bg-white/10 text-white/50");
 
   return (
-    <div className="rounded-2xl border border-white/[0.07] glass overflow-hidden">
-      <div className="px-5 py-4 border-b border-white/8">
+    <div className="card overflow-hidden">
+      <div className="px-5 py-4 border-b border-white/[0.07]">
         <p className="text-sm font-semibold text-white/80">{ts.comp_title}</p>
         <p className="text-xs text-white/35 mt-0.5">{ts.comp_sub}</p>
       </div>
@@ -675,7 +675,7 @@ function CompetitionStats() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/8 text-[10px] uppercase tracking-widest text-white/30">
+              <tr className="border-b border-white/[0.07] text-[10px] uppercase tracking-widest text-white/30">
                 <th className="px-5 py-3 text-left">{ts.col_comp}</th>
                 <th className="px-3 py-3 text-center">{ts.col_eval}</th>
                 <th className="px-3 py-3 text-center">1X2</th>
@@ -749,8 +749,8 @@ function StatsTab({ summary, loading }) {
         {rows.map(({ label, value, note, hl }, i) => (
           <div
             key={label}
-            className={`anim-fade-up rounded-2xl border p-6 ${
-              hl ? "border-emerald-500/25 bg-emerald-500/[0.07] shadow-lg shadow-emerald-500/[0.06]" : "glass border-white/[0.07]"
+            className={`anim-fade-up card-loose ${
+              hl ? "rounded-2xl border border-emerald-500/25 bg-emerald-500/[0.07] shadow-lg shadow-emerald-500/[0.06]" : "card"
             }`}
             style={{ animationDelay: `${i * 50}ms` }}
           >
@@ -782,7 +782,7 @@ function ButsTab({ summary, loading }) {
         {markets.map(({ label, value, note, color }, i) => (
           <div
             key={label}
-            className="anim-fade-up rounded-2xl border border-white/[0.07] glass p-5"
+            className="anim-fade-up card card-loose"
             style={{ animationDelay: `${i * 70}ms` }}
           >
             <p className="text-[10px] uppercase tracking-widest text-white/35">{label}</p>
@@ -792,7 +792,7 @@ function ButsTab({ summary, loading }) {
         ))}
       </div>
 
-      <div className="rounded-2xl border border-white/[0.07] glass p-5">
+      <div className="card card-loose">
         <p className="text-sm font-semibold text-white/70 mb-4">{ts.buts_visual}</p>
         <div className="space-y-4">
           <ProbBar label="Over 1.5" value={summary?.accuracy_over_1_5} colorClass="bg-gradient-to-r from-sky-400 to-cyan-500" />
@@ -902,8 +902,8 @@ function HistoriqueTab() {
             { label: th.accuracy,   value: stats.total ? `${Math.round(stats.ok/stats.total*100)}%` : "—", sub: th.acc_sub, hl: true },
             { label: th.forte,      value: stats.forteTotal ? `${Math.round(stats.forteOk/stats.forteTotal*100)}%` : "—", sub: `${stats.forteTotal} FORTE`, hl: true },
           ].map(({ label, value, sub, hl }) => (
-            <div key={label} className={`rounded-2xl border p-4 ${hl ? "border-emerald-500/25 bg-emerald-500/[0.07] shadow-md shadow-emerald-500/[0.06]" : "glass border-white/[0.07]"}`}>
-              <p className="text-[9px] uppercase tracking-widest text-white/30">{label}</p>
+            <div key={label} className={`card-tight ${hl ? "rounded-2xl border border-emerald-500/25 bg-emerald-500/[0.07] shadow-md shadow-emerald-500/[0.06]" : "card"}`}>
+              <p className="label-eyebrow">{label}</p>
               <p className={`mt-1.5 tabular-nums font-black ${hl ? "text-3xl text-emerald-300 text-glow" : "text-2xl text-white"}`}>{value}</p>
               <p className="text-[10px] text-white/30">{sub}</p>
             </div>
@@ -955,7 +955,7 @@ function HistoriqueTab() {
         </div>
       ) : (
         grouped.map(([date, rows]) => (
-          <div key={date} className="anim-fade-up overflow-hidden rounded-2xl border border-white/[0.07] glass">
+          <div key={date} className="anim-fade-up overflow-hidden card">
             {/* Date header */}
             <div className="comp-header flex items-center gap-3 border-b border-white/[0.06] px-4 py-2.5">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/30">
@@ -1502,7 +1502,7 @@ function DashboardPage() {
         <aside className="hidden xl:block fixed right-0 top-[60px] bottom-0 w-[256px] overflow-y-auto border-l border-white/[0.07] p-4 z-10 space-y-4" style={{ backgroundColor: "rgba(9,22,36,0.7)", backdropFilter: "blur(12px)" }}>
 
           {/* Mini stats */}
-          <div className="rounded-2xl border border-white/[0.07] glass p-4">
+          <div className="card card-tight">
             <p className="mb-3 text-[10px] uppercase tracking-[0.3em] text-white/30">{t.sidebar.performances}</p>
             {[
               ["Accuracy 1X2",    summary ? formatPercent(summary.accuracy_1x2)      : "—"],
@@ -1521,7 +1521,7 @@ function DashboardPage() {
           </div>
 
           {/* Top picks mini */}
-          <div className="rounded-2xl border border-white/[0.07] glass p-4">
+          <div className="card card-tight">
             <p className="mb-3 text-[10px] uppercase tracking-[0.3em] text-white/30">{t.sidebar.top_picks}</p>
             {topPicks.length === 0 ? (
               <p className="text-xs text-white/30">{t.sidebar.no_picks}</p>
