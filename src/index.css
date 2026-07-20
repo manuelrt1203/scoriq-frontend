@@ -435,3 +435,27 @@ img { display: block; max-width: 100%; }
   box-shadow: 0 2px 8px rgba(251, 146, 60, 0.35);
   color: #fff;
 }
+
+/* ============================================================
+   REDUCED MOTION — désactive les animations décoratives,
+   conserve le spinner de chargement (feedback essentiel)
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .anim-fade-up,
+  .anim-fade-in,
+  .anim-slide-left,
+  .anim-slide-down,
+  .anim-slide-right {
+    animation: none !important;
+  }
+  .ping-dot::before {
+    animation: none !important;
+  }
+  .odds-active {
+    animation: none !important;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

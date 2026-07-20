@@ -77,6 +77,7 @@ export function TeamLogo({ name, logo, size = "h-7 w-7" }) {
       <img
         src={logo}
         alt={name}
+        loading="lazy"
         className={`${size} rounded-md object-contain`}
         onError={() => setFailed(true)}
       />
@@ -104,7 +105,14 @@ export function ProbBar({ label, value, colorClass }) {
         <span className="text-white/55">{label}</span>
         <span className="font-semibold text-white tabular-nums">{formatPercent(value)}</span>
       </div>
-      <div className="h-3 overflow-hidden rounded-full bg-white/[0.07]">
+      <div
+        className="h-3 overflow-hidden rounded-full bg-white/[0.07]"
+        role="progressbar"
+        aria-label={label}
+        aria-valuenow={Math.round(width)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
         <div
           className={`h-full rounded-full ${colorClass} transition-all duration-[850ms] ease-out`}
           style={{ width: started ? `${width}%` : "0%", boxShadow: started ? "0 0 10px rgba(255,255,255,0.2)" : "none" }}

@@ -26,7 +26,7 @@ const SLOGAN  = "L'IA qui voit les matchs autrement";
 /* ── Competition flag lookup ── */
 const COMP_FLAGS = {
   "ligue 1": "🇫🇷", "ligue 2": "🇫🇷",
-  "premier league": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "championship": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+  "premier league": "🇬🇧", "championship": "🇬🇧",
   "la liga": "🇪🇸", "segunda": "🇪🇸",
   "bundesliga": "🇩🇪",
   "serie a": "🇮🇹", "serie b": "🇮🇹",
@@ -133,6 +133,8 @@ function StarButton({ active, onClick, size = 14 }) {
       onClick={(e) => { e.stopPropagation(); onClick(); }}
       className={`shrink-0 transition-colors ${active ? "text-amber-400" : "text-white/15 hover:text-white/40"}`}
       title={active ? "Retirer des favoris" : "Ajouter aux favoris"}
+      aria-label={active ? "Retirer des favoris" : "Ajouter aux favoris"}
+      aria-pressed={active}
     >
       <svg width={size} height={size} viewBox="0 0 24 24" fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -178,6 +180,7 @@ function LangToggle({ lang, toggleLang }) {
       onClick={toggleLang}
       className="flex items-center gap-px rounded-xl border border-white/[0.1] bg-white/[0.04] px-2.5 py-1.5 text-xs font-bold transition hover:bg-white/[0.08]"
       title="Changer de langue / Switch language"
+      aria-label="Changer de langue / Switch language"
     >
       <span className={lang === "fr" ? "accent-text" : "text-white/30"}>FR</span>
       <span className="mx-1 text-white/20">·</span>
@@ -195,6 +198,7 @@ function UserMenu({ user, profile, onOpenAccount }) {
     <button
       onClick={onOpenAccount}
       title="Mon compte"
+      aria-label="Mon compte"
       className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border transition accent-border hover:accent-bg-subtle-2"
       style={{ color: "var(--accent-light)" }}
     >
@@ -1312,7 +1316,7 @@ function DashboardPage() {
           >
             Voir
           </button>
-          <button onClick={() => setFavAlerts([])} className="shrink-0 text-amber-400/40 transition hover:text-amber-300">
+          <button onClick={() => setFavAlerts([])} className="shrink-0 text-amber-400/40 transition hover:text-amber-300" aria-label="Fermer la notification">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>
         </div>
@@ -1328,7 +1332,9 @@ function DashboardPage() {
           <div className="p-3">
             <p className="mb-2 px-2 text-[9px] uppercase tracking-[0.35em] text-white/25">{t.sidebar.sports}</p>
             <div className="flex items-center gap-2.5 rounded-xl accent-bg-subtle accent-border border px-3 py-2.5">
-              <span className="text-base leading-none">⚽</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-white/88" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"/><path d="M12 7l3.5 2.5-1.3 4.1h-4.4L8.5 9.5 12 7Z"/><path d="M12 3v4M12 21v-3.8M3.5 9l3-.5M20.5 9l-3-.5M4.5 16l2.8-2M19.5 16l-2.8-2"/>
+              </svg>
               <span className="text-sm font-semibold text-white/88">Football</span>
               {matches.length > 0 && (
                 <span className="ml-auto rounded-full accent-bg-subtle-2 accent-text px-2 py-0.5 text-xs font-bold">

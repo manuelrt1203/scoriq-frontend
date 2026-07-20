@@ -53,6 +53,7 @@ function AvatarBlock({ profile, user, onUpload, uploading }) {
           disabled={uploading}
           className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--bg-surface)] text-white/60 transition hover:text-white"
           title="Changer l'avatar"
+          aria-label="Changer l'avatar"
         >
           {uploading
             ? <Spinner size="xs" />
@@ -162,7 +163,7 @@ export default function AccountPage({ onClose, profile, onUpdateProfile, onUploa
             </svg>
             <h2 className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>Mon compte</h2>
           </div>
-          <button onClick={onClose} className="rounded-lg p-1.5 transition hover:bg-white/[0.07]" style={{ color: "var(--text-muted)" }}>
+          <button onClick={onClose} className="rounded-lg p-1.5 transition hover:bg-white/[0.07]" style={{ color: "var(--text-muted)" }} aria-label="Fermer mon compte">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>
         </div>
@@ -271,6 +272,8 @@ export default function AccountPage({ onClose, profile, onUpdateProfile, onUploa
                       key={opt.id}
                       onClick={() => setAccent(opt.id)}
                       title={opt.label}
+                      aria-label={opt.label}
+                      aria-pressed={accent === opt.id}
                       className="relative h-8 w-8 rounded-full transition-transform hover:scale-110"
                       style={{ backgroundColor: opt.main }}
                     >
@@ -294,19 +297,35 @@ export default function AccountPage({ onClose, profile, onUpdateProfile, onUploa
                 <p className="mb-3 text-sm text-[var(--text-secondary)]">Thème</p>
                 <div className="flex gap-2">
                   {[
-                    { id: "dark",  label: "🌙 Sombre" },
-                    { id: "light", label: "☀️ Clair" },
+                    {
+                      id: "dark", label: "Sombre",
+                      icon: (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/>
+                        </svg>
+                      ),
+                    },
+                    {
+                      id: "light", label: "Clair",
+                      icon: (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
+                        </svg>
+                      ),
+                    },
                   ].map((opt) => (
                     <button
                       key={opt.id}
                       onClick={() => setTheme(opt.id)}
-                      className="rounded-lg border px-4 py-2 text-sm font-medium transition"
+                      aria-pressed={theme === opt.id}
+                      className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition"
                       style={{
                         borderColor:     theme === opt.id ? "var(--accent)" : "var(--border)",
                         backgroundColor: theme === opt.id ? "rgba(var(--accent-rgb),0.12)" : "transparent",
                         color:           theme === opt.id ? "var(--accent-light)" : "var(--text-secondary)",
                       }}
                     >
+                      {opt.icon}
                       {opt.label}
                     </button>
                   ))}
