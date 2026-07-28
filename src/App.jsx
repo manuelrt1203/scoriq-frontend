@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Analytics } from "@vercel/analytics/react";
 import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
 import Matchdetails from "./Matchdetails.jsx";
@@ -8,6 +8,7 @@ import { useAuth } from "./lib/AuthContext.jsx";
 import { useProfile } from "./lib/useProfile.js";
 import { useFavorites } from "./lib/useFavorites.js";
 import FavorisManager from "./FavorisManager.jsx";
+import ChatAgent from "./ChatAgent.jsx";
 import { useLang } from "./lib/LanguageContext.jsx";
 import {
   formatGoals,
@@ -1150,6 +1151,33 @@ function DashboardPage() {
     navigate(`/match/${encoded}`, { state: { match } });
   }
 
+  /** Résout un match par noms d'équipes (utilisé par l'agent IA) et l'ouvre. */
+  const openMatchByNames = useCallback(
+    (home, away, date) => {
+      const norm = (s) => (s || "").trim().toLowerCase();
+      const found = [...matches, ...topPicks].find(
+        (m) =>
+          norm(m.home_team) === norm(home) &&
+          norm(m.away_team) === norm(away) &&
+          (!date || m.date?.startsWith(date))
+      );
+      openMatch(found || { home_team: home, away_team: away, date: date || "" });
+    },
+    [matches, topPicks]
+  );
+
+  const agentHandlers = useMemo(
+    () => ({
+      isFavorite: (type, name) => isFav(type, name),
+      toggleFavorite: (type, name) => toggle(type, name),
+      listFavorites: () => ({ teams: favTeams, competitions: favCompetitions }),
+      updateProfile: (fields) => updateProfile(fields),
+      switchTab: (tab) => setActiveTab(tab),
+      openMatch: openMatchByNames,
+    }),
+    [isFav, toggle, favTeams, favCompetitions, updateProfile, openMatchByNames]
+  );
+
   /* Filter + search + sort */
   const visibleMatches = useMemo(() => {
     let items = [...matches];
@@ -1573,6 +1601,8 @@ function DashboardPage() {
         </aside>
 
       </div>
+
+      <ChatAgent handlers={agentHandlers} />
     </div>
   );
 }
