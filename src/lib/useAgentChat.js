@@ -7,7 +7,7 @@ const MAX_ROUNDS = 6;
 /**
  * Pilote la conversation avec l'agent IA côté backend (/agent/chat).
  * `handlers` doit exposer les actions "client" que l'agent peut déclencher :
- * isFavorite, toggleFavorite, listFavorites, updateProfile, switchTab, openMatch.
+ * isFavorite, toggleFavorite, listFavorites, getProfile, updateProfile, switchTab, openMatch.
  */
 export function useAgentChat(handlers) {
   const [thread, setThread] = useState([]); // [{ role: "user"|"assistant", text }]
@@ -31,6 +31,8 @@ export function useAgentChat(handlers) {
             return { ok: true };
           case "list_favorites":
             return handlers.listFavorites();
+          case "get_profile":
+            return handlers.getProfile();
           case "update_profile": {
             const err = await handlers.updateProfile(input);
             return err ? { error: String(err.message || err) } : { ok: true };

@@ -1171,11 +1171,15 @@ function DashboardPage() {
       isFavorite: (type, name) => isFav(type, name),
       toggleFavorite: (type, name) => toggle(type, name),
       listFavorites: () => ({ teams: favTeams, competitions: favCompetitions }),
+      getProfile: () => ({
+        username: profile?.username ?? null,
+        notify_forte_picks: profile?.notify_forte_picks ?? null,
+      }),
       updateProfile: (fields) => updateProfile(fields),
       switchTab: (tab) => setActiveTab(tab),
       openMatch: openMatchByNames,
     }),
-    [isFav, toggle, favTeams, favCompetitions, updateProfile, openMatchByNames]
+    [isFav, toggle, favTeams, favCompetitions, profile, updateProfile, openMatchByNames]
   );
 
   /* Filter + search + sort */
