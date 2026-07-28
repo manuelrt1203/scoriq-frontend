@@ -107,7 +107,7 @@ export default function ChatAgent({ handlers }) {
           role="dialog"
           aria-modal="false"
           aria-label="Assistant ScorIQ"
-          className="card card-tight fixed bottom-24 right-4 z-50 flex h-[520px] max-h-[75vh] w-[360px] max-w-[92vw] flex-col p-0 shadow-2xl shadow-black/40 sm:right-6"
+          className="card card-tight fixed bottom-36 right-4 z-50 flex h-[520px] max-h-[65vh] w-[360px] max-w-[92vw] flex-col p-0 shadow-2xl shadow-black/40 sm:right-6 lg:bottom-24 lg:max-h-[75vh]"
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-white/[0.07] px-4 py-3">
@@ -217,7 +217,7 @@ export default function ChatAgent({ handlers }) {
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Fermer l'assistant ScorIQ" : "Ouvrir l'assistant ScorIQ"}
         aria-expanded={open}
-        className="btn-green fixed bottom-5 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-2xl shadow-emerald-500/30 transition-transform hover:scale-105 active:scale-95 sm:right-6"
+        className="btn-green fixed bottom-20 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-2xl shadow-emerald-500/30 transition-transform hover:scale-105 active:scale-95 sm:right-6 lg:bottom-5"
       >
         {open ? <CloseIcon /> : <ChatIcon />}
       </button>
